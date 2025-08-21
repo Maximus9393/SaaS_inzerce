@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "puppeteer": "^24.16.2"
+  },
+  "devDependencies": {
+  "concurrently": "^8.2.0",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
+  },
+  "scripts": {
+  "dev": "ts-node-dev --respawn --transpile-only smart-market-finder-1/backend/src/server.ts",
+  "frontend": "cd smart-market-finder-1/frontend && PORT=3002 npm start",
+  "start:all": "concurrently -k \"npm run dev\" \"npm run frontend\"",
+    "test": "jest --runInBand"
+  }
+}

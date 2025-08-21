@@ -1,0 +1,239 @@
+nohup: ignoring input
+
+> smart-market-finder@1.0.0 start
+> react-scripts start
+
+(node:86118) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:86118) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled successfully!
+
+You can now view smart-market-finder in the browser.
+
+  Local:            http://localhost:3002
+  On Your Network:  http://10.0.13.122:3002
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+asset static/js/bundle.js 1.94 MiB [emitted] (name: main) 1 related asset
+asset index.html 377 bytes [emitted]
+asset asset-manifest.json 190 bytes [emitted]
+cached modules 1.91 MiB (javascript) 28.3 KiB (runtime) [cached] 162 modules
+webpack 5.101.3 compiled successfully in 1758 ms
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+(node:86118) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.94 MiB [emitted] (name: main) 1 related asset
+  asset main.61ade86da1cfe7dcf830.hot-update.js 5.58 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.61ade86da1cfe7dcf830.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.94 MiB main.61ade86da1cfe7dcf830.hot-update.js 5.58 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/pages/Home.tsx 3.25 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 1587 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 1.94 MiB [cached] 2 assets
+asset asset-manifest.json 190 bytes [emitted]
+cached modules 1.91 MiB (javascript) 28.3 KiB (runtime) [cached] 161 modules
+./src/pages/Home.tsx 3.25 KiB [built]
+webpack 5.101.3 compiled successfully in 244 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.94 MiB [emitted] (name: main) 1 related asset
+  asset main.28bef98331294a937a1d.hot-update.js 7.43 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.28bef98331294a937a1d.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.94 MiB main.28bef98331294a937a1d.hot-update.js 7.43 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/pages/Home.tsx 4.72 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 1742 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 1.94 MiB [cached] 2 assets
+asset asset-manifest.json 190 bytes [emitted]
+cached modules 1.91 MiB (javascript) 28.3 KiB (runtime) [cached] 161 modules
+./src/pages/Home.tsx 4.72 KiB [built]
+webpack 5.101.3 compiled successfully in 278 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.94 MiB [emitted] (name: main) 1 related asset
+  asset main.7911af9bdbe596866930.hot-update.js 5.49 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.7911af9bdbe596866930.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.94 MiB main.7911af9bdbe596866930.hot-update.js 5.49 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/components/ResultsList.tsx 3.62 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 1109 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.94 MiB [emitted] (name: main) 1 related asset
+  asset main.7b6b2ad97c3e298fb97f.hot-update.js 5.95 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.7b6b2ad97c3e298fb97f.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.94 MiB main.7b6b2ad97c3e298fb97f.hot-update.js 5.95 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 3.54 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 611 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 1.94 MiB [cached] 2 assets
+asset asset-manifest.json 190 bytes [emitted]
+cached modules 1.9 MiB (javascript) 28.3 KiB (runtime) [cached] 160 modules
+javascript modules 7.16 KiB
+  ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 3.54 KiB [built]
+  ./src/components/ResultsList.tsx 3.62 KiB [built]
+webpack 5.101.3 compiled successfully in 304 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 1.94 MiB [cached] 2 assets
+asset asset-manifest.json 190 bytes [emitted]
+cached modules 1.9 MiB (javascript) 28.3 KiB (runtime) [cached] 159 modules
+javascript modules 11.9 KiB
+  ./src/pages/Home.tsx 4.72 KiB [built]
+  ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 3.54 KiB [built]
+  ./src/components/ResultsList.tsx 3.62 KiB [built]
+webpack 5.101.3 compiled successfully in 184 ms
+No issues found.
+Proxy error: Could not proxy request /api/search from 127.0.0.1:3002 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.95 MiB [emitted] (name: main) 1 related asset
+  asset main.e84ff2217cdc2c5a35d0.hot-update.js 6.13 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.e84ff2217cdc2c5a35d0.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.95 MiB main.e84ff2217cdc2c5a35d0.hot-update.js 6.13 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/components/SearchForm.tsx 4.1 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 966 ms
+No issues found.
+Proxy error: Could not proxy request /styles/main.css from 127.0.0.1:3002 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /index.js from 127.0.0.1:3002 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3002 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3002 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Compiling...
+Compiled successfully!
+assets by status 1.95 MiB [cached] 2 assets
+asset asset-manifest.json 190 bytes [emitted]
+cached modules 1.91 MiB (javascript) 28.3 KiB (runtime) [cached] 161 modules
+./src/components/SearchForm.tsx 4.1 KiB [built]
+webpack 5.101.3 compiled successfully in 110 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.95 MiB [emitted] (name: main) 1 related asset
+  asset main.d0a3608cafd904d847f2.hot-update.js 6.98 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.d0a3608cafd904d847f2.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.95 MiB main.d0a3608cafd904d847f2.hot-update.js 6.98 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/components/SearchForm.tsx 4.8 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 583 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.95 MiB (name: main)
+  asset static/js/bundle.js 1.95 MiB [emitted] (name: main) 1 related asset
+  asset main.6aa6861d36bd60850cec.hot-update.js 6.46 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.6aa6861d36bd60850cec.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.95 MiB (2.02 MiB) = static/js/bundle.js 1.95 MiB main.6aa6861d36bd60850cec.hot-update.js 6.46 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/components/ResultsList.tsx 4.44 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 444 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.96 MiB (name: main)
+  asset static/js/bundle.js 1.95 MiB [emitted] (name: main) 1 related asset
+  asset main.7b652fc0f3665a769faf.hot-update.js 8.32 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.7b652fc0f3665a769faf.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.96 MiB (2.02 MiB) = static/js/bundle.js 1.95 MiB main.7b652fc0f3665a769faf.hot-update.js 8.32 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./src/pages/Home.tsx 5.44 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 557 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.96 MiB (name: main)
+  asset static/js/bundle.js 1.95 MiB [emitted] (name: main) 1 related asset
+  asset main.5cdb5a384d434ba85d1f.hot-update.js 8.41 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.5cdb5a384d434ba85d1f.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.96 MiB (2.03 MiB) = static/js/bundle.js 1.95 MiB main.5cdb5a384d434ba85d1f.hot-update.js 8.41 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 5.99 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 153 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 377 bytes [cached] 1 asset
+assets by chunk 1.97 MiB (name: main)
+  asset static/js/bundle.js 1.95 MiB [emitted] (name: main) 1 related asset
+  asset main.1164b71b2e0fefedc271.hot-update.js 12.6 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+assets by path *.json 343 bytes
+  asset asset-manifest.json 315 bytes [emitted]
+  asset main.1164b71b2e0fefedc271.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.97 MiB (2.04 MiB) = static/js/bundle.js 1.95 MiB main.1164b71b2e0fefedc271.hot-update.js 12.6 KiB 2 auxiliary assets
+cached modules 1.91 MiB [cached] 146 modules
+runtime modules 28.3 KiB 15 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 10.2 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 150 ms
+No issues found.

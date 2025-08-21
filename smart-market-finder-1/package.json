@@ -1,0 +1,22 @@
+{
+  "name": "smart-market-finder",
+  "version": "1.0.0",
+  "description": "A project to find market products based on user search criteria.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/src/server.ts",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "backend": "ts-node backend/src/server.ts",
+    "frontend": "react-scripts start"
+  },
+  "dependencies": {
+    "concurrently": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.0",
+    "ts-node": "^10.0.0",
+    "react-scripts": "5.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
