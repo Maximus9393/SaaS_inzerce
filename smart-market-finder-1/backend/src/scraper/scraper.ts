@@ -14,6 +14,8 @@ type ScrapeOpts = {
   priceMax?: number;
   location?: string;
   strictLocation?: boolean;
+  // When true, the caller treats `location` as a postal-prefix and prefers postal matching
+  wantIsPostal?: boolean;
 };
 
 /**

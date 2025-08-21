@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SearchForm from '../components/SearchForm';
 import ResultsList from '../components/ResultsList';
+import DashboardHero from '../components/DashboardHero';
 import { searchMarket, getResults } from '../services/api';
 
 const Home: React.FC = () => {
@@ -39,6 +40,7 @@ const Home: React.FC = () => {
                     <h1>Smart Market Finder</h1>
                     <p className="lead">Rychlé hledání inzerátů z bazarů — přesně podle lokality a ceny.</p>
                 </header>
+                <DashboardHero />
                 <SearchForm onSearch={handleSearch} />
                 <div className="controls">
                     <div className="perpage">

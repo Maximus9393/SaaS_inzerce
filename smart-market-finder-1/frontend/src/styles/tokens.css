@@ -1,0 +1,54 @@
+/* Design tokens: colors, spacing, typography, and motion */
+:root {
+  /* Colors */
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --text: #0b2b4a;
+  --primary: #0b63d6; /* professional blue */
+  --primary-600: #0452a6;
+  --accent: #2bb673; /* growth green */
+  --accent-600: #1a7f37;
+  --glass: rgba(11,59,102,0.04);
+
+  /* UI */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 6px 14px rgba(11,43,76,0.06);
+  --shadow-md: 0 10px 30px rgba(11,43,76,0.08);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans';
+  --text-size-base: 16px;
+  --scale-sm: 0.875rem;
+  --scale-md: 1rem;
+  --scale-lg: 1.125rem;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* Motion */
+  --trans-fast: 180ms cubic-bezier(.2,.9,.3,1);
+  --trans-medium: 300ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* Dark theme overrides */
+.theme-dark {
+  --bg: #0b1220;
+  --surface: #0f1724;
+  --muted: #9aa6bb;
+  --text: #e6eef8;
+  --primary: #4aa3ff;
+  --primary-600: #1e88ff;
+  --accent: #2bb673;
+  --glass: rgba(255,255,255,0.03);
+  --shadow-sm: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+/* Container breakpoints */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
