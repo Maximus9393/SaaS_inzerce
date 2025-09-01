@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.filterResults = void 0;
+exports.filterResults = filterResults;
 function filterResults(items = [], opts = {}) {
     const { method = 'dedupe', keywords = '' } = opts;
     const seen = new Set();
@@ -25,7 +25,6 @@ function filterResults(items = [], opts = {}) {
     }
     return deduped;
 }
-exports.filterResults = filterResults;
 function score(item, kw) {
     if (!kw)
         return 0;

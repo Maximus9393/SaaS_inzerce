@@ -4,4 +4,5 @@ export interface MarketResult {
     location: string;
     url: string;
     date: Date;
+    thumbnail?: string;
 }

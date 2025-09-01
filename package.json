@@ -19,9 +19,10 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only smart-market-finder-1/backend/src/server.ts",
-  "frontend": "cd smart-market-finder-1/frontend && PORT=3002 npm start",
-  "start:all": "concurrently -k \"npm run dev\" \"npm run frontend\"",
+  "dev:backend": "ts-node-dev --respawn --transpile-only smart-market-finder-1/backend/src/server.ts",
+  "frontend": "cd smart-market-finder-1/frontend && npm start",
+  "dev": "node scripts/run-dev.js",
+  "start:all": "concurrently -k \"npm run dev:backend\" \"npm run frontend\"",
     "test": "jest --runInBand"
   }
 }

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchBazosAds = void 0;
+exports.fetchBazosAds = fetchBazosAds;
 const axios_1 = __importDefault(require("axios"));
 // use require to avoid ESM interop issues at runtime
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -27,8 +27,8 @@ function normalizeForCompare(s) {
  * Fetch Bazos ads using Cheerio HTML parsing.
  * URL format: https://www.bazos.cz/inzeraty/auta/<locality>/?q=<query>
  */
-function fetchBazosAds(searchQuery, locality, strictLocality = false) {
-    return __awaiter(this, void 0, void 0, function* () {
+function fetchBazosAds(searchQuery_1, locality_1) {
+    return __awaiter(this, arguments, void 0, function* (searchQuery, locality, strictLocality = false) {
         const q = encodeURIComponent(String(searchQuery || '').trim());
         const locSegment = encodeURIComponent(String(locality || '').trim());
         const locSegmentLower = encodeURIComponent(String(locality || '').trim().toLowerCase());
@@ -349,5 +349,4 @@ function fetchBazosAds(searchQuery, locality, strictLocality = false) {
         }
     });
 }
-exports.fetchBazosAds = fetchBazosAds;
 exports.default = fetchBazosAds;

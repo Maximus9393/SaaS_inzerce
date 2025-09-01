@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: smart-market-backend
+    env: docker
+    dockerfilePath: smart-market-finder-1/backend/Dockerfile
+    plan: starter
+    region: oregon
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: NODE_ENV
+        value: production
+  - type: web
+    name: smart-market-frontend
+    env: docker
+    dockerfilePath: smart-market-finder-1/frontend/Dockerfile
+    plan: starter
+    region: oregon
+    envVars:
+      - key: PORT
+        value: "3002"

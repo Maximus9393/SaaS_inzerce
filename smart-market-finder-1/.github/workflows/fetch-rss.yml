@@ -1,0 +1,27 @@
+name: Scheduled RSS fetch
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm --prefix smart-market-finder-1/backend ci
+
+      - name: Run RSS fetch for recommended feeds
+        env:
+          SBAZAR_FEED: ${{ secrets.SBAZAR_FEED }}
+          HYPER_FEED: ${{ secrets.HYPER_FEED }}
+        run: npm --prefix smart-market-finder-1/backend run fetch:rss all

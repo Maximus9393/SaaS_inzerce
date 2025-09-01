@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -32,29 +42,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.scrapeBazos = void 0;
+exports.scrapeBazos = scrapeBazos;
 /**
- * scrapeBazos - best-effort: if puppeteer is installed, use it; otherwise return mock results.
+ * Unified, modular scraper for Bazoš.
  */
-function scrapeBazos(opts = {}) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { keywords = '', priceMin, priceMax, location } = opts;
-        const results = [];
-        // helpers in function scope so both puppeteer and HTML fallback can use them
-        const normalizePrice = (p) => {
-            if (!p)
-                return '';
-            // replace non-breaking spaces and collapse whitespace, remove stray HTML entities
-            return String(p).replace(/&nbsp;|\u00A0/g, ' ').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+function scrapeBazos() {
+    return __awaiter(this, arguments, void 0, function* (opts = {}) {
+        const DEBUG = String(process.env.DEBUG_SCRAPER || '').toLowerCase() === 'true';
+        const logger = {
+            debug: (...args) => { if (DEBUG)
+                console.log('[scraper][debug]', ...args); },
+            info: (...args) => { if (DEBUG)
+                console.info('[scraper][info]', ...args); },
+            error: (...args) => { console.error('[scraper][error]', ...args); }
         };
-        const extractCurrency = (text) => {
+        const normalizeText = (s) => {
+            if (!s)
+                return '';
+            return String(s).replace(/&nbsp;|\u00A0/g, ' ').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+        };
+        const normalizeForMatch = (s) => String(normalizeText(s)).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+        const normalizePrice = (p) => normalizeText(p || '');
+        const extractCurrencyFromText = (text) => {
             if (!text)
                 return '';
             const s = String(text).replace(/&nbsp;|\u00A0/g, ' ');
-            // 1) Prefer explicit currency tokens like "499 000 Kč", "4.500 Kč", "4500 Kč", or with CZK
             const reUnit = /(\d{1,3}(?:[ \u00A0\.,]\d{3})*(?:[ \u00A0\.,]\d+)?\s*(?:Kč|Kc|CZK))/ig;
-            const matches = [];
             let mm = null;
+            const matches = [];
             while ((mm = reUnit.exec(s)) !== null) {
                 if (mm[1])
                     matches.push(mm[1].replace(/\s+/g, ' ').trim());
@@ -63,11 +78,9 @@ function scrapeBazos(opts = {}) {
                 matches.sort((a, b) => b.length - a.length);
                 return matches[0];
             }
-            // 2) Look for explicit "Cena:" context followed by a number
             const mCena = s.match(/Cena[:\s\-–—]*([^,\n]+)/i);
             if (mCena && mCena[1]) {
                 const c = (mCena[1] || '').trim();
-                // try to extract unit-aware token from this snippet
                 const cunit = c.match(/(\d{1,3}(?:[ \u00A0\.,]\d{3})*(?:[ \u00A0\.,]\d+)?\s*(?:Kč|Kc|CZK))/i);
                 if (cunit && cunit[1])
                     return cunit[1].replace(/\s+/g, ' ').trim();
@@ -75,678 +88,387 @@ function scrapeBazos(opts = {}) {
                 if (cnum && cnum[1])
                     return cnum[1].replace(/\s+/g, ' ').trim();
             }
-            // 3) Fallback: accept a bare number only if >= 1000 and not clearly a different unit (kw, km, ccm, rv/year)
-            // capture number and following token
             const reNum = /\b(\d{3,}(?:[ \u00A0\.,]\d{3})*)(?:\s*(\w+))?/g;
-            let best = '';
-            const MIN_BARE_PRICE = 10000; // avoid picking years like 2025 or small unrelated numbers
+            const MIN_BARE_PRICE = Number(process.env.MIN_BARE_PRICE || '10000');
             const currentYear = new Date().getFullYear();
+            mm = null;
             while ((mm = reNum.exec(s)) !== null) {
                 const numRaw = mm[1];
                 const follow = (mm[2] || '').toLowerCase();
-                // blacklist common non-price units
                 if (follow && ['kw', 'km', 'ccm', 'cc', 'rv', 'rok', 'ks'].includes(follow.replace(/\.|,/g, '')))
                     continue;
-                // parse numeric value
                 const digits = Number(String(numRaw).replace(/[ \u00A0\.,]/g, ''));
                 if (isNaN(digits))
                     continue;
-                // exclude four-digit tokens that look like years
                 if (digits >= 1900 && digits <= currentYear + 1)
                     continue;
-                if (digits >= MIN_BARE_PRICE) {
-                    best = String(numRaw).replace(/\s+/g, ' ').trim();
-                    break;
+                if (digits >= MIN_BARE_PRICE)
+                    return String(numRaw).replace(/\s+/g, ' ').trim();
+            }
+            return '';
+        };
+        const isValidPrice = (p) => {
+            if (!p)
+                return false;
+            const hasCurrency = /Kč|Kc|CZK/i.test(p);
+            const digits = Number(String(p).replace(/[^0-9]/g, '')) || 0;
+            const MIN_BARE_PRICE = Number(process.env.MIN_BARE_PRICE || '10000');
+            if (!hasCurrency && digits > 0 && digits < MIN_BARE_PRICE)
+                return false;
+            if (/^\d{4}$/.test(String(p).trim()))
+                return false;
+            return true;
+        };
+        const parseListingsFromHtml = (html, optsParse = {}) => {
+            try {
+                // dynamic import to keep deps optional
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                const cheerio = require('cheerio');
+                const $ = cheerio.load(html);
+                const base = optsParse.baseUrl || 'https://www.bazos.cz';
+                const anchors = $('h2.nadpis a, .inzeratynadpis a, .nadpis a').toArray();
+                const cap = Math.max(5, Math.min(50, Number(optsParse.limit || 20)));
+                const found = [];
+                for (let i = 0; i < anchors.length && found.length < cap; i++) {
+                    try {
+                        const a = anchors[i];
+                        const $a = $(a);
+                        const title = normalizeText($a.text() || '');
+                        let href = ($a.attr('href') || '').trim();
+                        if (!title || !href)
+                            continue;
+                        try {
+                            href = new URL(href, base).href;
+                        }
+                        catch (_a) { }
+                        if (!/\/inzerat\//i.test(href))
+                            continue;
+                        let container = $a.parent();
+                        let tries = 0;
+                        let priceText = '';
+                        let locText = '';
+                        let descText = '';
+                        while (container && tries < 6) {
+                            const p = container.find('.inzeratycena, .cena, .price, .velkaCena, .inzerat-cena').first();
+                            const l = container.find('.inzeratylok, .mesto, .locality, .umisteni').first();
+                            const d = container.find('.popis, .description, .inzerat-popis').first();
+                            if (p && p.length)
+                                priceText = (p.text() || '').trim() || priceText;
+                            if (l && l.length)
+                                locText = (l.text() || '').trim() || locText;
+                            if (d && d.length)
+                                descText = (d.text() || '').trim() || descText;
+                            if (priceText || locText || descText)
+                                break;
+                            const parent = container.parent();
+                            if (!parent || parent.length === 0)
+                                break;
+                            container = parent;
+                            tries++;
+                        }
+                        if (!priceText && container && container.length) {
+                            const allText = container.text() || '';
+                            const c = extractCurrencyFromText(allText);
+                            if (c)
+                                priceText = c;
+                        }
+                        let thumb = '';
+                        try {
+                            const img = $a.find('img').first();
+                            if (img && img.length) {
+                                thumb = ($(img).attr('src') || '').trim();
+                                try {
+                                    thumb = new URL(thumb, base).href;
+                                }
+                                catch (_b) { }
+                            }
+                            else if (container) {
+                                const img2 = container.find('img').first();
+                                if (img2 && img2.length) {
+                                    thumb = ($(img2).attr('src') || '').trim();
+                                    try {
+                                        thumb = new URL(thumb, base).href;
+                                    }
+                                    catch (_c) { }
+                                }
+                            }
+                        }
+                        catch (e) {
+                            logger.debug('[parseListingsFromHtml] thumb parse error', e && e.message ? e.message : e);
+                        }
+                        const item = {
+                            title: normalizeText(title),
+                            price: normalizePrice(priceText || ''),
+                            location: normalizeText(locText || ''),
+                            url: href,
+                            date: new Date().toISOString(),
+                            description: normalizeText(descText || ''),
+                            thumbnail: thumb || ''
+                        };
+                        found.push(item);
+                    }
+                    catch (e) {
+                        logger.debug('[parseListingsFromHtml] per-anchor error', e && e.message ? e.message : e);
+                    }
+                }
+                return found;
+            }
+            catch (e) {
+                logger.error('[parseListingsFromHtml] parser failed', e && e.message ? e.message : e);
+                return [];
+            }
+        };
+        const fetchDetailPage = (it, axiosImpl, cheerioImpl) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const r = yield axiosImpl.get(it.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }).catch(() => null);
+                if (!r || !r.data)
+                    return it;
+                const $ = cheerioImpl.load(r.data);
+                const metaDesc = ($('meta[property="og:description"]').attr('content') || $('meta[name="description"]').attr('content') || '').trim();
+                if ((!it.price || !isValidPrice(it.price)) && metaDesc) {
+                    const c = extractCurrencyFromText(metaDesc);
+                    if (c)
+                        it.price = normalizePrice(c);
+                }
+                if (!it.thumbnail || it.thumbnail === '') {
+                    const og = ($('meta[property="og:image"]').attr('content') || $('meta[name="og:image"]').attr('content') || '').trim();
+                    if (og) {
+                        try {
+                            it.thumbnail = new URL(og, it.url).href;
+                        }
+                        catch (_a) {
+                            it.thumbnail = og;
+                        }
+                    }
+                    else {
+                        const firstImg = $('img').first().attr('src') || '';
+                        if (firstImg) {
+                            try {
+                                it.thumbnail = new URL(String(firstImg).trim(), it.url).href;
+                            }
+                            catch (_b) {
+                                it.thumbnail = String(firstImg).trim();
+                            }
+                        }
+                    }
+                }
+                if ((!it.location || it.location.trim() === '') && metaDesc) {
+                    const lm = metaDesc.match(/Lokalita:\s*([^,\n]+)/i) || metaDesc.match(/([A-Za-zÁ-Žá-žěščřžůĚŠČŘŽŮ\s\-]+)\s*\d{3,}/i);
+                    if (lm && lm[1])
+                        it.location = normalizeText(lm[1]);
+                    else if (lm && lm[0])
+                        it.location = normalizeText(lm[0]);
+                }
+                try {
+                    const tbodyLocRow = $('tbody tr').filter((i, el) => { return ($(el).find('td').first().text() || '').trim().startsWith('Lokalita'); }).first();
+                    if (tbodyLocRow && tbodyLocRow.length) {
+                        const locTd = tbodyLocRow.find('td').eq(2);
+                        const anchors = locTd.find('a');
+                        if (anchors && anchors.length >= 1) {
+                            const postalText = $(anchors[0]).text().trim();
+                            if (/^\d{3,}/.test(postalText))
+                                it.postal = postalText.replace(/\s+/g, '').trim();
+                        }
+                        if ((!it.location || it.location === '') && anchors && anchors.length >= 2) {
+                            const detailCity = $(anchors[1]).text().trim();
+                            if (detailCity)
+                                it.location = normalizeText(detailCity);
+                        }
+                    }
+                }
+                catch (e) { /* ignore */ }
+                try {
+                    const tbodyPriceRow = $('tbody tr').filter((i, el) => { return ($(el).find('td').first().text() || '').trim().startsWith('Cena'); }).first();
+                    if (tbodyPriceRow && tbodyPriceRow.length) {
+                        const pb = tbodyPriceRow.find('b').first().text().trim();
+                        if (pb)
+                            it.price = normalizePrice(pb.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim());
+                    }
+                }
+                catch (e) { /* ignore */ }
+                if ((!it.price || !isValidPrice(it.price))) {
+                    const p = $('.inzeratydetdel b, .inzeratycena b, .inzeratydet .cena, .price').first().text().trim();
+                    if (p)
+                        it.price = normalizePrice(p);
+                }
+                if ((!it.location || it.location.trim() === '')) {
+                    const l = $('.inzeratydet tr:contains("Lokalita"), .inzeratylok, .locality').first().text().trim();
+                    if (l)
+                        it.location = normalizeText(l.replace(/Lokalita[:\s\-]*/i, ''));
                 }
             }
-            return best;
-        };
+            catch (e) {
+                logger.debug('[fetchDetailPage] per-item error', e && e.message ? e.message : e);
+            }
+            return it;
+        });
+        const fetchDetailsInBatches = (items_1, ...args_1) => __awaiter(this, [items_1, ...args_1], void 0, function* (items, concurrency = 3) {
+            try {
+                const axios = yield Promise.resolve().then(() => __importStar(require('axios'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
+                const cheerio = yield Promise.resolve().then(() => __importStar(require('cheerio'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
+                if (!axios || !cheerio)
+                    return items;
+                const toFetch = items.map((it, idx) => ({ it, idx })).filter(x => {
+                    const p = String(x.it.price || '').trim();
+                    const l = String(x.it.location || '').trim();
+                    return !isValidPrice(p) || !l || x.it.thumbnail === '';
+                });
+                if (toFetch.length === 0)
+                    return items;
+                const batchSize = Math.max(1, concurrency);
+                for (let i = 0; i < toFetch.length; i += batchSize) {
+                    const batch = toFetch.slice(i, i + batchSize);
+                    yield Promise.all(batch.map((b) => __awaiter(this, void 0, void 0, function* () {
+                        try {
+                            const updated = yield fetchDetailPage(b.it, axios, cheerio);
+                            items[b.idx] = updated;
+                        }
+                        catch (e) {
+                            logger.debug('[fetchDetailsInBatches] item fetch failed', e && e.message ? e.message : e);
+                        }
+                    })));
+                }
+            }
+            catch (e) {
+                logger.error('[fetchDetailsInBatches] error', e && e.message ? e.message : e);
+            }
+            return items;
+        });
+        const { keywords = '', priceMin, priceMax, location } = opts;
+        const results = [];
+        const requestedLimit = Math.max(1, Math.min(100, Number(opts.limit || 50)));
+        // Try puppeteer only if enabled and available
         try {
-            const puppeteer = yield Promise.resolve().then(() => __importStar(require('puppeteer'))).catch(() => null);
+            const enablePuppeteer = String(process.env.USE_PUPPETEER || '').toLowerCase() === 'true';
+            const puppeteer = enablePuppeteer ? yield Promise.resolve().then(() => __importStar(require('puppeteer'))).catch(() => null) : null;
             if (puppeteer) {
-                console.log('[scraper] puppeteer module found');
-                // allow using system chrome via env var and make launch options container-friendly
-                const launchOpts = {
-                    headless: true,
-                    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-                };
+                logger.debug('[scraper] puppeteer module found');
+                const launchOpts = { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] };
                 if (process.env.PUPPETEER_EXECUTABLE_PATH)
                     launchOpts.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
                 let browser = null;
                 try {
                     browser = yield puppeteer.launch(launchOpts);
-                    console.log('[scraper] puppeteer launched');
+                    logger.debug('[scraper] puppeteer launched');
                 }
                 catch (le) {
                     const msg = le && (typeof le === 'object' ? (le.message || String(le)) : String(le));
-                    console.error('[scraper] puppeteer launch error', msg);
+                    logger.error('[scraper] puppeteer launch error', msg);
                 }
                 if (browser) {
-                    const page = yield browser.newPage();
-                    yield page.setUserAgent('Mozilla/5.0 (compatible; SmartMarketFinder/1.0)');
-                    const q = encodeURIComponent(keywords);
-                    // Use Bazoš search endpoint - form action is /search.php with param 'hledat' and 'hlokalita'
-                    // build base search URL. Note: we avoid forcing humkreis=0 (exact locality)
-                    // because that often over-filters; instead we request hlokalita and
-                    // perform a post-filter with a relaxed fallback if too few results.
-                    let url = `https://www.bazos.cz/search.php?hledat=${q}`;
-                    if (location) {
-                        url += `&hlokalita=${encodeURIComponent(location)}`;
-                        if (opts && opts.strictLocation) {
-                            // force exact locality on the remote query when strict requested
-                            url += `&humkreis=0`;
-                        }
-                    }
-                    // navigate and wait for network idle; then wait for a listing container to appear
-                    yield page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 }).catch((e) => { const m = e && (typeof e === 'object' ? (e.message || String(e)) : String(e)); console.error('[scraper] page.goto error', m); });
                     try {
-                        // common listing containers on Bazoš: .inzeraty, .inzerat, .inzeratyflex
-                        yield page.waitForSelector('.inzeraty, .inzerat, .inzeratyflex, .inzerat-list', { timeout: 5000 }).catch(() => { });
-                    }
-                    catch (err) {
-                        // ignore - we'll still try extraction and fallback
-                    }
-                    // Debug: capture page title/url and sample outerHTMLs to inspect site structure
-                    try {
-                        const sample = yield page.evaluate(() => {
-                            // candidate selectors to probe
-                            const selectors = ['article', '[class*="inzerat"]', '.inzerat', '.inzeraty > li', '.inzerat-t-body', '.inzerat-wrap', '.inzerat-inner', '.inzerat-row', '.inzerat-list', '.inzeraty', '.inzeratyflex', '.inzeraty .inzerat'];
-                            const nodes = [];
-                            for (const s of selectors) {
-                                const list = Array.from(document.querySelectorAll(s));
-                                for (const n of list) {
-                                    try {
-                                        nodes.push({ sel: s, html: n.outerHTML.slice(0, 1000) });
-                                    }
-                                    catch (err) {
-                                        // ignore
-                                    }
-                                }
-                            }
-                            return {
-                                title: document.title,
-                                url: (window.location && window.location.href) ? window.location.href : document.URL,
-                                samples: nodes.slice(0, 10)
-                            };
-                        });
-                        console.log('[scraper] page debug', { url: sample.url, title: sample.title, sampleCount: (sample.samples || []).length });
-                        if (sample.samples && sample.samples.length > 0) {
-                            for (let i = 0; i < sample.samples.length; i++) {
-                                console.log(`[scraper] sample[${i}] sel=${sample.samples[i].sel} html=${sample.samples[i].html.replace(/\n/g, '')}`);
-                            }
+                        const page = yield browser.newPage();
+                        yield page.setUserAgent('Mozilla/5.0 (compatible; SmartMarketFinder/1.0)');
+                        const q = encodeURIComponent(keywords);
+                        let url = `https://www.bazos.cz/search.php?hledat=${q}`;
+                        if (location) {
+                            url += `&hlokalita=${encodeURIComponent(location)}`;
+                            if ((opts === null || opts === void 0 ? void 0 : opts.wantIsPostal) && !(opts === null || opts === void 0 ? void 0 : opts.strictLocation))
+                                url += `&humkreis=20`;
+                            else if (opts && opts.strictLocation)
+                                url += `&humkreis=0`;
                         }
-                    }
-                    catch (e) {
-                        const m = e && (typeof e === 'object' ? (e.message || String(e)) : String(e));
-                        console.error('[scraper] sample evaluate error', m);
-                    }
-                    // Use the page structure observed on Bazoš: container '.inzeraty.inzeratyflex' or '.inzeraty'
-                    try {
-                        const extracted = yield page.evaluate(() => {
-                            function normalizeText(el) {
-                                try {
-                                    return el ? (el.textContent || '').trim() : '';
-                                }
-                                catch (_a) {
-                                    return '';
-                                }
-                            }
-                            const anchors = Array.from(document.querySelectorAll('h2.nadpis a, .inzeratynadpis a, .nadpis a'));
-                            const items = [];
-                            for (const a of anchors.slice(0, 50)) {
-                                const title = (a.textContent || '').trim();
-                                const href = a.href || '';
-                                // climb up to find a container that contains price or location
-                                let container = a.parentElement;
-                                let tries = 0;
-                                while (container && tries < 6) {
-                                    if (container.querySelector('.inzeratycena, .cena, .price, .inzeratylok, .mesto, .locality'))
-                                        break;
-                                    container = container.parentElement;
-                                    tries++;
-                                }
-                                // fallback to closest article or list item
-                                if (!container)
-                                    container = a.closest('article, li, .inzerat, .inzeraty');
-                                // Try to find price/location/description in container, but also check common siblings
-                                let price = '';
-                                let loc = '';
-                                let desc = '';
-                                if (container) {
-                                    const priceEl = container.querySelector('.inzeratycena, .cena, .price, .velkaCena, .inzerat-cena');
-                                    const locEl = container.querySelector('.inzeratylok, .mesto, .locality, .umisteni');
-                                    const descEl = container.querySelector('.popis, .description, .inzerat-popis');
-                                    if (priceEl)
-                                        price = normalizeText(priceEl);
-                                    if (locEl)
-                                        loc = normalizeText(locEl);
-                                    if (descEl)
-                                        desc = normalizeText(descEl);
-                                    // sometimes price is in a sibling element (e.g. container's parent has .inzeratycena)
-                                    if (!price && container.parentElement) {
-                                        const siblingPrice = container.parentElement.querySelector('.inzeratycena, .cena, .price');
-                                        if (siblingPrice)
-                                            price = normalizeText(siblingPrice);
-                                    }
-                                    // As a last resort, look for .inzeraty ancestor and find price inside it
-                                    if (!price) {
-                                        const listAncestor = a.closest('.inzeraty, .listainzerat');
-                                        if (listAncestor) {
-                                            const pa = listAncestor.querySelector('.inzeratycena, .cena, .price');
-                                            if (pa)
-                                                price = normalizeText(pa);
-                                        }
-                                    }
-                                    // regex fallback: try to match currency in container text
-                                    if (!price) {
-                                        const txt = normalizeText(container);
-                                        try {
-                                            // window won't have our extractCurrency helper; implement a small inline regex
-                                            const m = txt.match(/(\d{1,3}(?:[ \u00A0\.,]\d{3})*(?:[ \u00A0\.,]\d+)?\s*(?:Kč|Kc|CZK))/i);
-                                            if (m && m[1])
-                                                price = m[1].trim();
-                                        }
-                                        catch (e) {
-                                            // ignore
-                                        }
-                                    }
-                                }
-                                items.push({ title, href, price, loc, desc });
-                            }
-                            return items;
-                        }).catch(() => []);
-                        for (const it of extracted) {
-                            if (it && it.title && it.href) {
-                                results.push({ title: String(it.title).trim(), price: normalizePrice(String(it.price || '')), location: String(it.loc || location || '').trim(), url: String(it.href), date: new Date().toISOString(), description: String(it.desc || '').trim() });
-                            }
-                        }
-                    }
-                    catch (eEval) {
-                        const m = eEval && (typeof eEval === 'object' ? (eEval.message || String(eEval)) : String(eEval));
-                        console.error('[scraper] evaluate extraction error', m);
-                    }
-                    console.log('[scraper] items scraped (pre-filter)', results.length);
-                    // determine strict flag early
-                    const strict = Boolean(opts === null || opts === void 0 ? void 0 : opts.strictLocation);
-                    // Enrich items that lack price or location by fetching the ad detail page.
-                    // Some listing layouts show price/location only in the detail page or meta tags.
-                    try {
-                        const axios = yield Promise.resolve().then(() => __importStar(require('axios'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
-                        const cheerio = yield Promise.resolve().then(() => __importStar(require('cheerio'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
-                        if (axios && cheerio) {
-                            for (let i = 0; i < results.length; i++) {
-                                const it = results[i];
-                                if ((!it.price || it.price.trim() === '') || (!it.location || it.location.trim() === '')) {
-                                    try {
-                                        const r = yield axios.get(it.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }).catch(() => null);
-                                        if (r && r.data) {
-                                            const $ = cheerio.load(r.data);
-                                            // Try meta descriptions first (they often contain 'Cena: ... , Lokalita: ...')
-                                            const metaDesc = ($('meta[property="og:description"]').attr('content') || $('meta[name="description"]').attr('content') || '').trim();
-                                            if ((!it.price || it.price.trim() === '') && metaDesc) {
-                                                // use extractCurrency on metaDesc via server-side helper
-                                                const c = extractCurrency(metaDesc);
-                                                if (c)
-                                                    it.price = c;
-                                                else {
-                                                    const m = metaDesc.match(/Cena:\s*([^,\n]+)/i);
-                                                    if (m && m[1])
-                                                        it.price = m[1].trim();
-                                                }
-                                            }
-                                            if ((!it.location || it.location.trim() === '') && metaDesc) {
-                                                const lm = metaDesc.match(/Lokalita:\s*([^,\n]+)/i) || metaDesc.match(/Praha\s*\d*/i);
-                                                if (lm && lm[1])
-                                                    it.location = lm[1].trim();
-                                                else if (lm && lm[0])
-                                                    it.location = lm[0].trim();
-                                            }
-                                            // If still missing, try detail page selectors
-                                            // Post-enrichment: repair suspicious price values (e.g. year-like "2025" or numbers < 10000)
-                                            for (let i = 0; i < results.length; i++) {
-                                                const it = results[i];
-                                                try {
-                                                    const priceRaw = String(it.price || '').trim();
-                                                    const looksLikeYear = /^\d{4}$/.test(priceRaw);
-                                                    const numericVal = Number(priceRaw.replace(/[^0-9]/g, '')) || 0;
-                                                    const tooSmall = numericVal > 0 && numericVal < 10000;
-                                                    if (priceRaw === '' || looksLikeYear || tooSmall) {
-                                                        let replaced = false;
-                                                        const r2 = yield axios.get(it.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }).catch(() => null);
-                                                        if (r2 && r2.data) {
-                                                            const $2 = cheerio.load(r2.data);
-                                                            // Prefer authoritative tbody layout: pick Lokalita row's 2nd <a> and Cena row's <b>
-                                                            const metaDesc2 = ($2('meta[property="og:description"]').attr('content') || $2('meta[name="description"]').attr('content') || '').trim();
-                                                            let newPrice = '';
-                                                            try {
-                                                                const tbodyLocRow2 = $2('tbody tr').filter((i, el) => { return ($2(el).find('td').first().text() || '').trim().startsWith('Lokalita'); }).first();
-                                                                if (tbodyLocRow2 && tbodyLocRow2.length) {
-                                                                    const locTd2 = tbodyLocRow2.find('td').eq(2);
-                                                                    const anchors2 = locTd2.find('a');
-                                                                    if (anchors2 && anchors2.length >= 2) {
-                                                                        const detailLoc2 = $2(anchors2[1]).text().trim();
-                                                                        if (detailLoc2)
-                                                                            it.location = detailLoc2.replace(/\s+/g, ' ').trim();
-                                                                    }
-                                                                }
-                                                            }
-                                                            catch (e) {
-                                                                // ignore
-                                                            }
-                                                            // Prefer price from tbody 'Cena' row
-                                                            try {
-                                                                const tbodyPriceRow2 = $2('tbody tr').filter((i, el) => { return ($2(el).find('td').first().text() || '').trim().startsWith('Cena'); }).first();
-                                                                if (tbodyPriceRow2 && tbodyPriceRow2.length) {
-                                                                    const pb2 = tbodyPriceRow2.find('b').first().text().trim();
-                                                                    if (pb2)
-                                                                        newPrice = pb2.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-                                                                }
-                                                            }
-                                                            catch (e) {
-                                                                // ignore
-                                                            }
-                                                            if (!newPrice && metaDesc2)
-                                                                newPrice = extractCurrency(metaDesc2) || '';
-                                                            if (!newPrice) {
-                                                                const p2 = $2('.inzeratydetdel b, .inzeratycena b, .inzeratydet .cena, .price').first().text().trim();
-                                                                if (p2)
-                                                                    newPrice = p2.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-                                                            }
-                                                            if (newPrice) {
-                                                                // accept newPrice only if it contains explicit currency token or numeric value >= MIN_BARE_PRICE
-                                                                const hasCurrencyToken = /Kč|Kc|CZK/i.test(newPrice);
-                                                                const digitsNew = Number(String(newPrice).replace(/[^0-9]/g, '')) || 0;
-                                                                const MIN_BARE_PRICE = 10000;
-                                                                if (hasCurrencyToken || (digitsNew >= MIN_BARE_PRICE)) {
-                                                                    it.price = newPrice;
-                                                                    replaced = true;
-                                                                }
-                                                            }
-                                                            // if we couldn't find a sane price, clear suspicious year-like or too-small value
-                                                            if (!replaced && (looksLikeYear || tooSmall))
-                                                                it.price = '';
-                                                        }
-                                                    }
-                                                }
-                                                catch (e) {
-                                                    // ignore per-item repair errors
-                                                }
-                                            }
-                                            if (!it.price || it.price.trim() === '') {
-                                                const p = $('.inzeratydetdel b, .inzeratycena b, .inzeratydet .cena, .price').first().text().trim();
-                                                if (p)
-                                                    it.price = p.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-                                            }
-                                            if (!it.location || it.location.trim() === '') {
-                                                const l = $('.inzeratydet tr:contains("Lokalita"), .inzeratylok, .locality').first().text().trim();
-                                                if (l)
-                                                    it.location = l.replace(/\s+/g, ' ').trim();
-                                            }
-                                        }
-                                    }
-                                    catch (e) {
-                                        // ignore per-item fetch errors
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (e) {
-                        // ignore enrichment errors
-                    }
-                    // If strictLocation is requested, fetch each ad detail page to get the authoritative 'Lokalita'
-                    // and drop any ad whose detail-page location does not match the requested location.
-                    if (strict) {
+                        yield page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 }).catch((e) => { const m = e && (typeof e === 'object' ? (e.message || String(e)) : String(e)); logger.error('[scraper] page.goto error', m); });
                         try {
-                            const axios = yield Promise.resolve().then(() => __importStar(require('axios'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
-                            const cheerio = yield Promise.resolve().then(() => __importStar(require('cheerio'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
-                            if (axios && cheerio) {
-                                const wantNorm = String(location || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-                                const keep = [];
-                                for (const it of results) {
-                                    try {
-                                        const r = yield axios.get(it.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }).catch(() => null);
-                                        let detailLoc = '';
-                                        if (r && r.data) {
-                                            const $ = cheerio.load(r.data);
-                                            // try to extract postal code from the tbody Lokalita row first <a> (postal link)
-                                            try {
-                                                const tbodyLocRow = $('tbody tr').filter((i, el) => { return ($(el).find('td').first().text() || '').trim().startsWith('Lokalita'); }).first();
-                                                if (tbodyLocRow && tbodyLocRow.length) {
-                                                    const locTd = tbodyLocRow.find('td').eq(2);
-                                                    const anchors = locTd.find('a');
-                                                    if (anchors && anchors.length >= 1) {
-                                                        const postalText = $(anchors[0]).text().trim();
-                                                        if (/^\d{3,}/.test(postalText)) {
-                                                            it.postal = postalText.replace(/\s+/g, '').trim();
-                                                        }
-                                                    }
-                                                    if ((!detailLoc || detailLoc === '') && anchors && anchors.length >= 2) {
-                                                        const detailCity = $(anchors[1]).text().trim();
-                                                        if (detailCity)
-                                                            detailLoc = detailCity;
-                                                    }
-                                                }
-                                            }
-                                            catch (e) {
-                                                // ignore
-                                            }
-                                            const metaDesc = ($('meta[property="og:description"]').attr('content') || $('meta[name="description"]').attr('content') || '').trim();
-                                            if (metaDesc && !detailLoc) {
-                                                const lm = metaDesc.match(/Lokalita:\s*([^,\n]+)/i) || metaDesc.match(/([A-Za-zÁ-Žá-žěščřžůĚŠČŘŽŮ\s\-]+)\s*\d{3,}/i);
-                                                if (lm && lm[1])
-                                                    detailLoc = lm[1].trim();
-                                            }
-                                            if (!detailLoc) {
-                                                // try known detail selectors
-                                                const l = $('.inzeratydet tr:contains("Lokalita"), .inzeratylok, .locality').first().text().trim();
-                                                if (l) {
-                                                    // remove label if present
-                                                    detailLoc = l.replace(/Lokalita[:\s\-]*/i, '').trim();
-                                                }
-                                            }
-                                        }
-                                        if (detailLoc) {
-                                            it.location = detailLoc;
-                                            const norm = String(detailLoc).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-                                            // If user requested a postal code (PSČ), prefer matching against extracted postal codes
-                                            const wantPostalRaw = String(location || '').replace(/\s+/g, '');
-                                            const wantIsPostal = /^\d{3,}$/.test(wantPostalRaw);
-                                            if (wantIsPostal) {
-                                                // match when the detail page provided a postal code and it starts with the requested PSČ
-                                                if (it.postal && it.postal.replace(/\s+/g, '').startsWith(wantPostalRaw)) {
-                                                    keep.push(it);
-                                                }
-                                                else if (norm.includes(wantNorm)) {
-                                                    // fallback to text match if postal wasn't available
-                                                    keep.push(it);
-                                                }
-                                                else {
-                                                    // not matching strict locality -> drop
-                                                }
-                                            }
-                                            else {
-                                                if (norm.includes(wantNorm)) {
-                                                    keep.push(it);
-                                                }
-                                                else {
-                                                    // not matching strict locality -> drop
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            // if we couldn't determine location from detail page, drop the item under strict mode
-                                        }
-                                    }
-                                    catch (e) {
-                                        // on any error assume not matching and drop
-                                    }
-                                }
-                                // replace results with strictly-matching set
-                                results.length = 0;
-                                results.push(...keep);
-                            }
+                            yield page.waitForSelector('.inzeraty, .inzerat, .inzeratyflex, .inzerat-list', { timeout: 5000 }).catch(() => { });
                         }
-                        catch (e) {
-                            console.error('[scraper] strict-location detail enrichment error', e && e.message ? e.message : e);
-                            // if error, fall through to later filtering (will likely reject)
+                        catch (_a) { }
+                        const html = yield page.content();
+                        const parsed = parseListingsFromHtml(html, { baseUrl: url, limit: requestedLimit });
+                        if (parsed && parsed.length > 0) {
+                            results.push(...parsed);
+                            yield fetchDetailsInBatches(results, Number(process.env.DETAIL_PAR_CONCURRENCY || '3'));
                         }
                     }
-                    // If a desired location was specified, filter results by matching location/title/description text.
-                    // Behavior differs when strictLocation is requested: strict -> do not relax; relaxed -> fallback when too few.
-                    if (location) {
-                        const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-                        const want = normalize(String(location));
-                        const before = results.length;
-                        const filtered = results.filter(r => {
-                            return normalize(r.location).includes(want) || normalize(r.title).includes(want) || normalize(String(r.description || '')).includes(want);
-                        });
-                        console.log('[scraper] filtering by location (title/loc/desc)', location, 'before=', before, 'after=', filtered.length);
-                        if (strict) {
-                            // strict locality requested: only accept filtered results (could be zero)
-                            if (filtered.length > 0) {
-                                results.length = 0;
-                                results.push(...filtered);
-                            }
-                            else {
-                                console.log('[scraper] strict locality requested and filtering removed all results; returning EMPTY set');
-                                results.length = 0;
-                            }
-                        }
-                        else {
-                            const MIN_ACCEPT = 5; // if fewer than this after filtering, prefer the unfiltered set
-                            if (filtered.length >= MIN_ACCEPT) {
-                                results.length = 0;
-                                results.push(...filtered);
-                            }
-                            else {
-                                console.log('[scraper] filtered results below MIN_ACCEPT; relaxing locality and returning unfiltered set');
-                                // keep results as-is (unfiltered)
-                            }
-                        }
+                    catch (e) {
+                        logger.debug('[scraper] puppeteer extraction error', e && e.message ? e.message : e);
                     }
-                    yield browser.close();
+                    finally {
+                        try {
+                            yield browser.close();
+                        }
+                        catch (_b) { }
+                    }
                 }
                 else {
-                    console.log('[scraper] browser not available, will fall back to mock');
+                    logger.debug('[scraper] browser not available, will fall back to HTML fetch');
                 }
             }
         }
         catch (e) {
-            const msg = e && (typeof e === 'object' ? (e.message || String(e)) : String(e));
-            console.error('[scraper] runtime error', msg);
+            logger.error('[scraper] runtime error', e && e.message ? e.message : e);
         }
+        // HTML fallback
         if (results.length === 0) {
-            console.log('[scraper] no items from puppeteer — trying HTML fallback');
+            logger.debug('[scraper] no items from puppeteer — trying HTML fallback');
             try {
                 const axios = yield Promise.resolve().then(() => __importStar(require('axios'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
                 const cheerio = yield Promise.resolve().then(() => __importStar(require('cheerio'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
                 if (axios && cheerio) {
                     const q = encodeURIComponent(keywords);
-                    // use same search endpoint as puppeteer and restrict by locality
                     let htmlUrl = `https://www.bazos.cz/search.php?hledat=${q}`;
                     if (location)
                         htmlUrl += `&hlokalita=${encodeURIComponent(location)}`;
-                    console.log('[scraper] fetching HTML', htmlUrl);
-                    const res = yield axios.get(htmlUrl).catch((e) => { console.error('[scraper] axios.get error', e && e.message); return null; });
+                    logger.debug('[scraper] fetching HTML', htmlUrl);
+                    const res = yield axios.get(htmlUrl).catch((e) => { logger.error('[scraper] axios.get error', e && e.message); return null; });
                     if (res && res.data) {
-                        const $ = cheerio.load(res.data);
-                        // Anchor-driven extraction: find anchors (title links), climb up to a reasonable container
-                        // and extract price/location/description. This mirrors the Puppeteer logic and is more
-                        // resilient across category layout variants.
-                        const found = [];
-                        // Only consider likely ad title links; avoid generic <a> that point to categories
-                        const anchors = $('h2.nadpis a, .inzeratynadpis a, .nadpis a').toArray();
-                        for (let i = 0; i < anchors.length && found.length < 20; i++) {
-                            try {
-                                const a = anchors[i];
-                                const $a = $(a);
-                                const title = ($a.text() || '').trim();
-                                let href = ($a.attr('href') || '').trim();
-                                if (!title || !href)
-                                    continue;
-                                // resolve relative URLs
-                                try {
-                                    href = new URL(href, htmlUrl).href;
-                                }
-                                catch ( /* keep as-is */_a) { /* keep as-is */ }
-                                // only accept links that look like ad detail pages (contain '/inzerat/')
-                                if (!/\/inzerat\//i.test(href))
-                                    continue;
-                                // climb parents up to 6 levels to find price/location elements
-                                let container = $a.parent();
-                                let tries = 0;
-                                let priceText = '';
-                                let locText = '';
-                                let descText = '';
-                                while (container && tries < 6) {
-                                    // search for known selectors
-                                    const p = container.find('.inzeratycena, .cena, .price, .velkaCena, .inzerat-cena').first();
-                                    const l = container.find('.inzeratylok, .mesto, .locality, .umisteni').first();
-                                    const d = container.find('.popis, .description, .inzerat-popis').first();
-                                    if (p && p.length)
-                                        priceText = (p.text() || '').trim();
-                                    if (l && l.length)
-                                        locText = (l.text() || '').trim();
-                                    if (d && d.length)
-                                        descText = (d.text() || '').trim();
-                                    if (priceText || locText || descText)
-                                        break;
-                                    const parent = container.parent();
-                                    if (!parent || parent.length === 0)
-                                        break;
-                                    container = parent;
-                                    tries++;
-                                }
-                                // fallback: if price still empty, try to regex a currency-like token from container text
-                                if (!priceText && container && container.length) {
-                                    const allText = container.text() || '';
-                                    const c = extractCurrency(allText);
-                                    if (c)
-                                        priceText = c;
-                                }
-                                // normalize price whitespace and nbsp
-                                const priceNorm = typeof priceText === 'string' ? String(priceText).replace(/\u00A0/g, ' ').replace(/&nbsp;|\s+/g, ' ').trim() : '';
-                                const locNorm = (locText || location || '').trim();
-                                const descNorm = (descText || '').trim();
-                                found.push({ title, price: priceNorm, location: locNorm, url: href, date: new Date().toISOString(), description: descNorm });
-                            }
-                            catch (err) {
-                                // ignore per-item errors
-                            }
+                        const parsed = parseListingsFromHtml(String(res.data), { baseUrl: htmlUrl, limit: requestedLimit });
+                        if (parsed && parsed.length > 0) {
+                            results.push(...parsed);
+                            yield fetchDetailsInBatches(results, Number(process.env.DETAIL_PAR_CONCURRENCY || '3'));
                         }
-                        if (found.length > 0) {
-                            console.log('[scraper] html fallback found', found.length);
-                            results.push(...found.slice(0, 20));
-                            // After HTML fallback, attempt to repair suspicious price tokens by fetching detail pages
-                            try {
-                                const axios = yield Promise.resolve().then(() => __importStar(require('axios'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
-                                const cheerio = yield Promise.resolve().then(() => __importStar(require('cheerio'))).then(m => (m && m.default) ? m.default : m).catch(() => null);
-                                if (axios && cheerio) {
-                                    for (let i = 0; i < results.length; i++) {
-                                        const it = results[i];
-                                        const priceRaw = String(it.price || '').trim();
-                                        const looksLikeYear = /^\d{4}$/.test(priceRaw);
-                                        const numericVal = Number(priceRaw.replace(/[^0-9]/g, '')) || 0;
-                                        const tooSmall = numericVal > 0 && numericVal < 10000;
-                                        if (priceRaw === '' || looksLikeYear || tooSmall) {
-                                            let replaced = false;
-                                            try {
-                                                const r3 = yield axios.get(it.url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }).catch(() => null);
-                                                if (r3 && r3.data) {
-                                                    const $3 = cheerio.load(r3.data);
-                                                    // prefer tbody 'Lokalita' 2nd anchor and tbody 'Cena' <b>
-                                                    try {
-                                                        const tbodyLocRow3 = $3('tbody tr').filter((i, el) => { return ($3(el).find('td').first().text() || '').trim().startsWith('Lokalita'); }).first();
-                                                        if (tbodyLocRow3 && tbodyLocRow3.length) {
-                                                            const locTd3 = tbodyLocRow3.find('td').eq(2);
-                                                            const anchors3 = locTd3.find('a');
-                                                            if (anchors3 && anchors3.length >= 2) {
-                                                                const detailLoc3 = $3(anchors3[1]).text().trim();
-                                                                if (detailLoc3)
-                                                                    it.location = detailLoc3.replace(/\s+/g, ' ').trim();
-                                                            }
-                                                        }
-                                                    }
-                                                    catch (e) {
-                                                        // ignore
-                                                    }
-                                                    let newPrice = '';
-                                                    try {
-                                                        const tbodyPriceRow3 = $3('tbody tr').filter((i, el) => { return ($3(el).find('td').first().text() || '').trim().startsWith('Cena'); }).first();
-                                                        if (tbodyPriceRow3 && tbodyPriceRow3.length) {
-                                                            const pb3 = tbodyPriceRow3.find('b').first().text().trim();
-                                                            if (pb3)
-                                                                newPrice = pb3.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-                                                        }
-                                                    }
-                                                    catch (e) {
-                                                        // ignore
-                                                    }
-                                                    const metaDesc3 = ($3('meta[property="og:description"]').attr('content') || $3('meta[name="description"]').attr('content') || '').trim();
-                                                    if (!newPrice && metaDesc3)
-                                                        newPrice = extractCurrency(metaDesc3) || '';
-                                                    if (!newPrice) {
-                                                        const p3 = $3('.inzeratydetdel b, .inzeratycena b, .inzeratydet .cena, .price').first().text().trim();
-                                                        if (p3)
-                                                            newPrice = p3.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-                                                    }
-                                                    if (newPrice) {
-                                                        const hasCurrencyToken = /Kč|Kc|CZK/i.test(newPrice);
-                                                        const digitsNew = Number(String(newPrice).replace(/[^0-9]/g, '')) || 0;
-                                                        const MIN_BARE_PRICE = 10000;
-                                                        if (hasCurrencyToken || (digitsNew >= MIN_BARE_PRICE)) {
-                                                            it.price = newPrice;
-                                                            replaced = true;
-                                                        }
-                                                    }
-                                                    if (!replaced && (looksLikeYear || tooSmall))
-                                                        it.price = '';
-                                                }
-                                            }
-                                            catch (e) {
-                                                // ignore per-item fetch errors
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            catch (e) {
-                                // ignore
-                            }
-                        }
-                        else {
-                            console.log('[scraper] html fallback found nothing');
-                        }
+                        else
+                            logger.debug('[scraper] html fallback found nothing');
                     }
                 }
             }
             catch (e) {
-                const m = e && (typeof e === 'object' ? (e.message || String(e)) : String(e));
-                console.error('[scraper] html fallback error', m);
+                logger.error('[scraper] html fallback error', e && e.message ? e.message : e);
             }
-            // apply same location filtering to HTML fallback results if needed
+            // simplified location filtering
             if (location && results.length > 0) {
-                const locLower = String(location).toLowerCase();
-                const before = results.length;
-                const filtered = results.filter(r => (r.location || '').toLowerCase().includes(locLower) || (r.title || '').toLowerCase().includes(locLower) || (String(r.description || '')).toLowerCase().includes(locLower));
-                console.log('[scraper] post-html filtering by location', location, 'before=', before, 'after=', filtered.length);
-                const MIN_ACCEPT = 5;
-                if (filtered.length >= MIN_ACCEPT) {
-                    results.length = 0;
-                    results.push(...filtered);
+                try {
+                    const wantNorm = normalizeForMatch(String(location));
+                    const before = results.length;
+                    const filtered = results.filter(r => normalizeForMatch(r.location).includes(wantNorm) || normalizeForMatch(r.title).includes(wantNorm) || normalizeForMatch(r.description).includes(wantNorm));
+                    logger.debug('[scraper] post-fetch filtering by location', location, 'before=', before, 'after=', filtered.length);
+                    const MIN_ACCEPT = Number(process.env.MIN_ACCEPT || '3');
+                    const strict = Boolean(opts === null || opts === void 0 ? void 0 : opts.strictLocation);
+                    if (strict) {
+                        if (filtered.length > 0) {
+                            results.length = 0;
+                            results.push(...filtered);
+                        }
+                        else {
+                            logger.debug('[scraper] strict locality requested and filtering removed all results; returning EMPTY set');
+                            results.length = 0;
+                        }
+                    }
+                    else {
+                        if (filtered.length >= MIN_ACCEPT) {
+                            results.length = 0;
+                            results.push(...filtered);
+                        }
+                        else {
+                            logger.debug('[scraper] post-fetch filtered below MIN_ACCEPT; relaxing locality');
+                        }
+                    }
                 }
-                else {
-                    console.log('[scraper] post-html filtered results below MIN_ACCEPT; relaxing locality and returning unfiltered set');
-                    // keep results as-is
+                catch (e) {
+                    logger.debug('[scraper] location filtering error', e && e.message ? e.message : e);
                 }
             }
             if (results.length === 0) {
-                if (location) {
-                    console.log('[scraper] no results after applying location filter; returning empty set for strict locality search');
-                }
+                if (location)
+                    logger.debug('[scraper] no results after applying location filter; returning empty set for strict locality search');
                 else {
-                    // keep legacy mock fallback for non-locality searches
-                    results.push({
-                        title: `Test item matching "${keywords}"`,
-                        price: priceMin ? `${priceMin} Kč` : '100 Kč',
-                        location: location || 'Praha',
-                        url: `https://example.com/mock/${encodeURIComponent(keywords)}-1`,
-                        date: new Date().toISOString(),
-                    });
-                    results.push({
-                        title: `Second test item ${keywords}`,
-                        price: priceMax ? `${priceMax} Kč` : '200 Kč',
-                        location: location || 'Brno',
-                        url: `https://example.com/mock/${encodeURIComponent(keywords)}-2`,
-                        date: new Date().toISOString(),
-                    });
+                    results.push({ title: `Test item matching "${keywords}"`, price: priceMin ? `${priceMin} Kč` : '100 Kč', location: location || 'Praha', url: `https://example.com/mock/${encodeURIComponent(keywords)}-1`, date: new Date().toISOString(), });
+                    results.push({ title: `Second test item ${keywords}`, price: priceMax ? `${priceMax} Kč` : '200 Kč', location: location || 'Brno', url: `https://example.com/mock/${encodeURIComponent(keywords)}-2`, date: new Date().toISOString(), });
                 }
             }
         }
-        // Final cleanup: avoid exposing year-like or too-small numeric tokens as prices
         try {
-            const MIN_BARE_PRICE = 10000;
+            const MIN_BARE_PRICE = Number(process.env.MIN_BARE_PRICE || '10000');
             for (const it of results) {
                 try {
                     const p = String(it.price || '').trim();
@@ -755,20 +477,13 @@ function scrapeBazos(opts = {}) {
                     const looksLikeYear = /^\d{4}$/.test(p);
                     const digits = Number(String(p).replace(/[^0-9]/g, '')) || 0;
                     const hasCurrency = /Kč|Kc|CZK/i.test(p);
-                    if ((!hasCurrency && looksLikeYear) || (!hasCurrency && digits > 0 && digits < MIN_BARE_PRICE)) {
-                        // clear ambiguous price
+                    if ((!hasCurrency && looksLikeYear) || (!hasCurrency && digits > 0 && digits < MIN_BARE_PRICE))
                         it.price = '';
-                    }
                 }
-                catch (e) {
-                    // ignore per-item
-                }
+                catch (e) { /* ignore per-item */ }
             }
         }
-        catch (e) {
-            // ignore final cleanup errors
-        }
+        catch (e) { /* ignore final cleanup errors */ }
         return results;
     });
 }
-exports.scrapeBazos = scrapeBazos;

@@ -1,7 +1,8 @@
 import express from 'express';
-import { setRoutes } from './routes/marketRoutes';
+import marketRoutes from './routes/marketRoutes';
 import { logger } from './utils/logger';
 import path from 'path';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -9,6 +10,11 @@ const PORT = Number(process.env.PORT) || 3000;
 // parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// paths to built frontend (used by root handler)
+// __dirname is backend/dist when compiled; go up two levels to reach smart-market-finder-1
+const frontendBuild = path.join(__dirname, '..', '..', 'frontend', 'build');
+const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
 
 // Middleware: measure approximate incoming header size and log when large
 app.use((req, _res, next) => {
@@ -27,18 +33,35 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Basic root route to avoid "Cannot GET /"
-app.get('/', (_req, res) => {
-  res.send(`<html><body><h2>Smart Market Finder API</h2>
+// Basic root route: serve frontend index.html when available, otherwise return a small API stub
+app.get('/', (req, res) => {
+  const indexPath = path.join(frontendBuild, 'index.html');
+  if (require('fs').existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  return res.send(`<html><body><h2>Smart Market Finder API</h2>
     <p>API endpoints: <a href="/api/results">/api/results</a>, POST /api/search</p></body></html>`);
 });
 
-// optionally serve frontend build if exists
-const frontendDist = path.join(__dirname, '../../../../frontend/dist');
-app.use(express.static(frontendDist));
+// optionally serve frontend build if exists (prefer `frontend/build` if present, then `frontend/dist`)
+if (require('fs').existsSync(frontendBuild)) {
+  app.use(express.static(frontendBuild));
+  // SPA fallback: serve index.html for any non-API GET route to support client-side routing
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    const index = path.join(frontendBuild, 'index.html');
+    if (require('fs').existsSync(index)) return res.sendFile(index);
+    return next();
+  });
+} else if (require('fs').existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+}
 
 // mount API routes
-setRoutes(app);
+app.use('/api', marketRoutes);
+
+// global error handler (should be after routes)
+app.use(errorHandler as any);
 
 // start server only when run directly
 if (require.main === module) {

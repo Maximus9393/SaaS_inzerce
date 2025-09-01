@@ -1,14 +1,14 @@
 /* Design tokens: colors, spacing, typography, and motion */
 :root {
   /* Colors */
-  --bg: #f7f8fa;
+  --bg: #f6fbff;
   --surface: #ffffff;
   --muted: #6b7280;
   --text: #0b2b4a;
-  --primary: #0b63d6; /* professional blue */
-  --primary-600: #0452a6;
-  --accent: #2bb673; /* growth green */
-  --accent-600: #1a7f37;
+  --primary: #0a4fb0; /* deeper professional blue */
+  --primary-600: #063a86;
+  --accent: #18a673; /* growth green */
+  --accent-600: #0f7a44;
   --glass: rgba(11,59,102,0.04);
 
   /* UI */
@@ -32,6 +32,9 @@
   --trans-fast: 180ms cubic-bezier(.2,.9,.3,1);
   --trans-medium: 300ms cubic-bezier(.2,.9,.3,1);
 }
+
+/* Prefer Inter if available via system or imported in index.html/build. As fallback, @import from Google CDN. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Dark theme overrides */
 .theme-dark {

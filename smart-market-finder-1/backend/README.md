@@ -46,3 +46,13 @@ The application uses a logger utility for logging messages and errors. Ensure to
 ## Contributing
 
 Feel free to submit issues or pull requests for improvements or bug fixes.
+
+## Importing a full PSČ dataset
+
+To provide full national PSČ coverage, place a CSV named `psc.csv` into `src/utils/` with lines formatted as `code,city` (code is 3-5 digit PSČ). Then run:
+
+```bash
+npm run import:psc
+```
+
+This will generate `src/utils/psc.json` which the application will load at runtime.
