@@ -1,1 +1,6 @@
 node_modules
+
+
+# Ignore frontend build outputs (generated files)
+smart-market-finder-1/frontend/build/
+smart-market-finder-1/frontend/build/**
