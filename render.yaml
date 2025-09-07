@@ -11,8 +11,8 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        # set to your Render managed Postgres connection string
-        value: ""
+  # set to your Render managed Postgres connection string
+  value: "postgresql://databaze_saas_inzerce_user:g0el0uVQpT1cjkdMF4B4bX1vrD8wIP5W@dpg-d2ut8cje5dus73f4h6v0-a.frankfurt-postgres.render.com/databaze_saas_inzerce"
       - key: REDIS_URL
         # optional: set to your Redis URL
         value: ""
