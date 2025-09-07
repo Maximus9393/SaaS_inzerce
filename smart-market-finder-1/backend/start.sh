@@ -4,8 +4,15 @@ set -e
 echo "[start.sh] container startup: begin"
 
 # Generate Prisma client (safe even without DB)
-echo "[start.sh] running: npx prisma generate"
-npx prisma generate || echo "[start.sh] prisma generate failed (continuing)"
+SCHEMA_PATH="/app/prisma/schema.prisma"
+if [ -f "$SCHEMA_PATH" ]; then
+  echo "[start.sh] found prisma schema at $SCHEMA_PATH"
+  echo "[start.sh] running: npx prisma generate --schema=$SCHEMA_PATH"
+  npx prisma generate --schema="$SCHEMA_PATH" || echo "[start.sh] prisma generate failed (continuing)"
+else
+  echo "[start.sh] prisma schema not found at $SCHEMA_PATH, running default npx prisma generate"
+  npx prisma generate || echo "[start.sh] prisma generate failed (continuing)"
+fi
 
 # If DATABASE_URL is set, attempt to run migrations with retries (useful when DB isn't immediately ready)
 if [ -n "$DATABASE_URL" ]; then
@@ -14,7 +21,17 @@ if [ -n "$DATABASE_URL" ]; then
   SLEEP_SECS=5
   i=0
   until [ "$i" -ge "$MAX_RETRIES" ]; do
-    if npx prisma migrate deploy; then
+    if [ -f "$SCHEMA_PATH" ]; then
+      if npx prisma migrate deploy --schema="$SCHEMA_PATH"; then
+        echo "[start.sh] prisma migrate deploy succeeded"
+        break
+      fi
+    else
+      if npx prisma migrate deploy; then
+        echo "[start.sh] prisma migrate deploy succeeded"
+        break
+      fi
+    fi
       echo "[start.sh] prisma migrate deploy succeeded"
       break
     fi
