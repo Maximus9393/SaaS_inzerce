@@ -1,10 +1,6 @@
 import React from 'react';
+import AddListing from './AddListing';
 
-const AddAd: React.FC = () => (
-  <div>
-    <h2>Přidat inzerát</h2>
-    <p>Tato funkce bude brzy dostupná. Zatím si můžete nechat posílat novinky.</p>
-  </div>
-);
+const AddAd: React.FC = () => <AddListing />;
 
 export default AddAd;

@@ -13,6 +13,12 @@ jest.mock('../dist/scraper/scraper', () => ({
   })
 }));
 
+// Prevent Meili from being used in this compiled test (ensures scraper mock is exercised)
+jest.mock('../dist/search/meili', () => {
+  // Simulate module not present / causing require to fail
+  throw new Error('meili mocked out for test');
+});
+
 const { searchMarket } = require('../dist/services/marketService');
 
 describe('searchMarket (compiled)', () => {

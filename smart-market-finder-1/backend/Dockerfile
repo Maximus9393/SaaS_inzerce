@@ -23,12 +23,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-# install all deps (including dev deps for tsc)
-RUN npm ci --prefer-offline --no-audit --progress=false
+# install all deps (including dev deps for tsc). Try `npm ci` for reproducible installs, fall back to `npm install` when lockfile is missing.
+RUN (npm ci --prefer-offline --no-audit --progress=false) || (npm install --no-audit --no-fund --progress=false)
 
 # Copy source and build
 COPY . .
 RUN npm run build
+# generate Prisma client in the builder so the generated client is available
+RUN npx prisma generate || true
 
 # Production image
 FROM node:18-bullseye-slim
@@ -52,10 +54,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-# copy package.json and install only production deps
-COPY package.json package-lock.json* ./
-RUN npm ci --production --prefer-offline --no-audit --progress=false
-
+# Copy node_modules (including generated Prisma client) and built artifacts from builder
+COPY --from=builder /app/node_modules ./node_modules
 # copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/utils/psc.json ./dist/src/utils/psc.json

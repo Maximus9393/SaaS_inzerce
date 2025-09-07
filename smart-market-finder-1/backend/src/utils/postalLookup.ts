@@ -20,9 +20,17 @@ if (!pscData || pscData.length === 0) {
   const path = require('path');
   const candidates = [
     path.join(__dirname, 'psc.json'),
-    path.join(__dirname, '..', 'src', 'utils', 'psc.json'),
-    path.join(process.cwd(), 'smart-market-finder-1', 'backend', 'src', 'utils', 'psc.json'),
-    path.join(process.cwd(), 'smart-market-finder-1', 'backend', 'dist', 'utils', 'psc.json')
+    // when running from dist, src may be adjacent
+  path.join(__dirname, '..', 'src', 'utils', 'psc.json'),
+  // compiled layout: dist/utils -> go up twice to project src
+  path.join(__dirname, '..', '..', 'src', 'utils', 'psc.json'),
+    // common project-root relative paths
+    path.join(process.cwd(), 'src', 'utils', 'psc.json'),
+    path.join(process.cwd(), 'dist', 'src', 'utils', 'psc.json'),
+    path.join(process.cwd(), 'backend', 'src', 'utils', 'psc.json'),
+  path.join(process.cwd(), 'backend', 'dist', 'src', 'utils', 'psc.json'),
+  // dist sibling locations
+  path.join(__dirname, '..', '..', 'dist', 'src', 'utils', 'psc.json')
   ];
   for (const c of candidates) {
     try {

@@ -5,17 +5,18 @@
   "main": "index.js",
   "scripts": {
     "start": "node backend/src/server.ts",
-  "dev": "concurrently \"npm run dev --prefix backend\" \"PORT=3001 npm start --prefix frontend\"",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"PORT=3001 npm start --prefix frontend\"",
     "backend": "ts-node backend/src/server.ts",
     "frontend": "react-scripts start"
   },
   "dependencies": {
-    "concurrently": "^6.0.0"
+    "concurrently": "^6.0.0",
+    "puppeteer": "^24.18.0"
   },
   "devDependencies": {
-    "typescript": "^4.0.0",
+    "react-scripts": "5.0.0",
     "ts-node": "^10.0.0",
-    "react-scripts": "5.0.0"
+    "typescript": "^4.0.0"
   },
   "author": "",
   "license": "ISC"

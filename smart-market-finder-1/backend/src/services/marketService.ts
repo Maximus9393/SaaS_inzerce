@@ -1,6 +1,8 @@
 import { MarketResult } from '../models/market';
+import { postalToCoords, cityToCoords, haversine } from '../utils/geo';
 import { scrapeBazos, ScrapeItem } from '../scraper/scraper';
 import lookupPostalPrefixes, { suggestPostal, PostalSuggestion } from '../utils/postalLookup';
+import { redisGet, redisSet } from '../utils/redisClient';
 
 // Try Meili first when available (dynamically)
 let meiliClient: any = null;
@@ -17,6 +19,11 @@ export interface SearchCriteria {
     limit?: number;
     pageSize?: number;
     saveToDb?: boolean;
+    portal?: string;
+    // sort: one of 'date'|'price'|'km'|'distance'
+    sort?: 'date' | 'price' | 'km' | 'distance';
+    // order: 'asc'|'desc'
+    order?: 'asc' | 'desc';
 }
 
 type MeiliIndex = { search: (q: string, opts?: any) => Promise<any> };
@@ -37,13 +44,31 @@ const parsePrice = (raw: string | number | undefined): number => {
 
 const deduplicateResults = <T extends { url?: string; title?: string }>(items: T[]): T[] => {
     const seen = new Map<string, T>();
+    const normalizeTitle = (s?: string) => {
+        if (!s) return '';
+        try { return String(s).normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/\s+/g, ' ').trim(); } catch { return String(s).toLowerCase().replace(/\s+/g, ' ').trim(); }
+    };
+    const normalizeUrlKey = (u?: string) => {
+        if (!u) return '';
+        try {
+            const url = new URL(String(u).trim());
+            // strip query and fragment
+            url.search = '';
+            url.hash = '';
+            return url.href;
+        } catch {
+            // fallback: strip ? and #
+            return String(u).split(/[?#]/)[0].trim();
+        }
+    };
     for (const it of items) {
-        const key = (it.url && String(it.url).trim()) || (it.title && String(it.title).trim()) || undefined;
+        const urlKey = normalizeUrlKey(it.url);
+        const titleKey = normalizeTitle(it.title);
+        const key = urlKey || (titleKey ? `t:${titleKey}` : undefined);
         if (key) {
             if (!seen.has(key)) seen.set(key, it);
         } else {
-            // keep items without stable key by generating a stable-ish key from title+index
-            const fallback = `${String(it.title || '')}:${seen.size}`;
+            const fallback = `f:${seen.size}`;
             if (!seen.has(fallback)) seen.set(fallback, it);
         }
     }
@@ -110,7 +135,9 @@ const runMeiliSearch = async (q: string, rawLocation: string, isPostalLike: bool
                 price: Number(h.price) || 0,
                 location: h.city || h.locality || '',
                 url: h.url || '',
-                date: h.pubDate ? new Date(h.pubDate) : new Date()
+                    date: h.pubDate ? new Date(h.pubDate) : new Date(),
+                    images: Array.isArray(h.images) ? h.images : (h.image ? [h.image] : []),
+                    description: h.description || h.metaDescription || ''
             }));
             return hits.filter(h => Boolean(h.title));
         }
@@ -208,15 +235,92 @@ const mapScrapeItemsToMarketResults = (items: ScrapeItem[], pageSize: number): M
         price: parsePrice(r.price as any),
         location: r.location || r.postal || '',
         url: r.url || '',
-        date: r.date ? new Date(r.date) : new Date(),
-        thumbnail: (r as any).thumbnail || undefined
+                date: r.date ? new Date(r.date) : new Date(),
+    thumbnail: (r as any).thumbnail || undefined,
+    images: (r as any).images && Array.isArray((r as any).images) && (r as any).images.length ? (r as any).images : ((r as any).thumbnail ? [(r as any).thumbnail] : []),
+        description: (r as any).description || '',
+        // try to parse mileage from description or title (simple heuristic)
+        km: (() => {
+            try {
+                const txt = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
+                const m = txt.match(/(\d{1,3}(?:[ \u00A0,]\d{3})+)\s*(km|kilometr|km\.)/i);
+                if (m && m[1]) return Number(String(m[1]).replace(/[^0-9]/g, ''));
+                const m2 = txt.match(/(\d{4,6})\s*(km|kilometr)/i);
+                if (m2 && m2[1]) return Number(m2[1]);
+            } catch (e) { /* ignore */ }
+            return undefined;
+        })(),
+        distance: undefined
     }));
     return mapped.filter(m => Boolean(m.title)).slice(0, pageSize);
+};
+
+// Apply sorting based on criteria; default: date desc
+const applySort = (items: MarketResult[], criteria?: SearchCriteria): MarketResult[] => {
+    if (!Array.isArray(items) || items.length === 0) return items;
+    const sortBy = (criteria && criteria.sort) ? criteria.sort : 'date';
+    const order = (criteria && criteria.order) ? criteria.order : 'desc';
+
+    const cmp = (a: any, b: any) => {
+        let va: any = a[sortBy as keyof MarketResult];
+        let vb: any = b[sortBy as keyof MarketResult];
+        // normalize dates
+        if (sortBy === 'date') { va = a.date ? new Date(a.date).getTime() : 0; vb = b.date ? new Date(b.date).getTime() : 0; }
+        // special handling for distance: treat undefined/null/NaN as Infinity so unknown distances sort last
+        if (sortBy === 'distance') {
+            const da = (va === undefined || va === null || isNaN(Number(va))) ? Infinity : Number(va);
+            const db = (vb === undefined || vb === null || isNaN(Number(vb))) ? Infinity : Number(vb);
+            if (da < db) return -1; if (da > db) return 1; return 0;
+        }
+        // ensure numbers for other sorts
+        va = (typeof va === 'number') ? va : (va ? Number(va) : 0);
+        vb = (typeof vb === 'number') ? vb : (vb ? Number(vb) : 0);
+        if (va < vb) return -1; if (va > vb) return 1; return 0;
+    };
+
+    const sorted = items.slice().sort((a, b) => {
+        const r = cmp(a, b);
+        return order === 'asc' ? r : -r;
+    });
+    return sorted;
+};
+
+// compute simple relevance score for results given the query keywords
+const scoreAndSortResults = (items: MarketResult[], rawQuery: string): MarketResult[] => {
+    if (!rawQuery || !Array.isArray(items) || items.length === 0) return items;
+    const normalize = (s: string) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    const q = normalize(rawQuery).replace(/[\s\-\_\,]+/g, ' ').trim();
+    const qTokens = q.split(' ').filter(Boolean);
+
+    const scoreFor = (m: MarketResult) => {
+        let score = 0;
+        const title = normalize(String(m.title || ''));
+        const desc = normalize(String(m.description || ''));
+
+        // exact phrase in title gives a big boost
+        if (q && title.includes(q)) score += 50;
+        // token matches in title (weighted)
+        for (const t of qTokens) { if (t && title.includes(t)) score += 8; }
+        // token matches in description (lighter)
+        for (const t of qTokens) { if (t && desc.includes(t)) score += 2; }
+        // prefer items with a non-empty price (likely a real listing)
+        if (m.price && Number(m.price) > 0) score += 4;
+        // penalize extremely short titles (likely junk)
+        if ((m.title || '').length < 10) score -= 6;
+        // small boost if image present
+        if (m.images && Array.isArray(m.images) && m.images.length) score += 3;
+        return score;
+    };
+
+    const scored = items.map(i => ({ item: i, s: scoreFor(i) }));
+    scored.sort((a, b) => b.s - a.s);
+    return scored.map(s => s.item);
 };
 
 // --- Public API -------------------------------------------------
 export const searchMarket = async (criteria: SearchCriteria): Promise<MarketResult[]> => {
     const keywords = String(criteria?.keywords || criteria?.query || '').trim();
+    const preferredPortal = String((criteria as any)?.portal || '').trim();
     const rawLocation = String(criteria?.location || criteria?.locality || '').trim();
     const strict = Boolean(criteria?.strictLocation || criteria?.strict);
     const requested = Number(criteria?.limit || criteria?.pageSize || 10) || 10;
@@ -225,6 +329,40 @@ export const searchMarket = async (criteria: SearchCriteria): Promise<MarketResu
 
     const numericClean = rawLocation.replace(/\s+/g, '');
     const isPostalLike = /^\d{3,}$/.test(numericClean);
+        // origin: either originPostal (string) or originLat/originLon numbers
+        const originPostal = (criteria as any)?.originPostal ? String((criteria as any).originPostal).trim() : '';
+        const originLat = (criteria as any)?.originLat ? Number((criteria as any).originLat) : undefined;
+        const originLon = (criteria as any)?.originLon ? Number((criteria as any).originLon) : undefined;
+        const originCoord = (() => {
+            if (originLat !== undefined && originLon !== undefined && !isNaN(originLat) && !isNaN(originLon)) return { lat: originLat, lon: originLon };
+            if (originPostal) {
+                try { const { normalizePostalCode } = require('../utils/geo'); return postalToCoords(normalizePostalCode(String(originPostal))); } catch { return postalToCoords(originPostal); }
+            }
+            // if user supplied location as city, try to map
+            return cityToCoords(rawLocation);
+        })();
+
+    // Redis cache key
+    const cacheTTL = Number(process.env.REDIS_CACHE_TTL || 60); // seconds
+    const cacheKey = `search:${keywords}:${rawLocation}:${pageSize}`;
+
+    // Try Redis cache first
+    try {
+        const cached = await redisGet(cacheKey);
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed)) {
+                    lastResultsCache = parsed.slice(0, pageSize);
+                    return lastResultsCache;
+                }
+            } catch (e) {
+                // ignore parse errors
+            }
+        }
+    } catch (e) {
+        // ignore redis errors
+    }
 
     // 1) Try Meili (fast path)
     try {
@@ -268,27 +406,87 @@ export const searchMarket = async (criteria: SearchCriteria): Promise<MarketResu
 
     // Final dedupe and mapping
     const unique = deduplicateResults(aggregated) as ScrapeItem[];
-    const mapped = mapScrapeItemsToMarketResults(unique, pageSize);
+    let mapped = mapScrapeItemsToMarketResults(unique, pageSize);
 
+        // propagate postal code from scraped items if available and compute distance (prefer detail lat/lon)
+        if (originCoord) {
+            for (const m of mapped) {
+                try {
+                    const src = unique.find(u => u.url === m.url) as any;
+                    const p = src?.postal || undefined;
+                    if (p) (m as any).postal = p;
+                    let targetCoord = null as any;
+                    // prefer explicit detail coords
+                    if (src && src.lat !== undefined && src.lon !== undefined && !isNaN(Number(src.lat)) && !isNaN(Number(src.lon))) {
+                        targetCoord = { lat: Number(src.lat), lon: Number(src.lon) };
+                    } else {
+                        if (p) targetCoord = postalToCoords(String(p));
+                        if (!targetCoord) targetCoord = cityToCoords(m.location || '');
+                        // Try lightweight city fallback: strip district numbers and trailing parts after comma/dash
+                        if (!targetCoord && m.location) {
+                            const short = String(m.location).split(/[,-]/)[0].replace(/\b\d+\b/g, '').trim();
+                            if (short && short.length < String(m.location).length) {
+                                targetCoord = cityToCoords(short);
+                            }
+                        }
+                    }
+                    const d = haversine(originCoord as any, targetCoord as any);
+                    (m as any).distance = isFinite(d) ? d : undefined;
+                } catch (e) { /* ignore per-item */ }
+            }
+        }
+
+    // If client requested a portal preference, bias results so items from that portal appear first
+    try {
+        const portal = preferredPortal && preferredPortal.length ? preferredPortal.toLowerCase() : '';
+        const portalDomain = (() => {
+            if (!portal) return '';
+            if (portal.includes('.')) return portal;
+            if (portal.includes('bazo')) return 'bazos.cz';
+            if (portal.includes('sauto')) return 'sauto.cz';
+            if (portal.includes('tip')) return 'tipcars.cz';
+            if (portal.includes('autos') || portal.includes('auto')) return 'sauto.cz';
+            return portal;
+        })();
+        if (portalDomain) {
+            const fav: MarketResult[] = [];
+            const other: MarketResult[] = [];
+            for (const m of mapped) {
+                try {
+                    if (m.url && String(m.url).toLowerCase().includes(portalDomain)) fav.push(m);
+                    else other.push(m);
+                } catch (e) { other.push(m); }
+            }
+            mapped = fav.concat(other);
+        }
+    } catch (e) { /* ignore portal bias errors */ }
+
+    // apply requested sort (defaults to date desc)
+    mapped = applySort(mapped, criteria as any);
     lastResultsCache = mapped;
+
+    // store in redis (best-effort)
+    try {
+        await redisSet(cacheKey, JSON.stringify(mapped), cacheTTL);
+    } catch (e) {
+        // ignore cache write errors
+    }
     // Optional persistence: save found results to DB (idempotent where possible)
     if (criteria?.saveToDb) {
         try {
-            // lazy import to avoid circular deps at module load
-            const { saveListing } = await import('./listingService' as any).catch(() => ({ saveListing: null }));
-            if (saveListing) {
-                const concurrency = Number(process.env.DB_WRITE_CONCURRENCY || 3);
-                await runInBatches<MarketResult, any>(mapped, async (m) => {
+            // enqueue persistence task to avoid blocking request-response
+            const { enqueue } = await import('../utils/persistQueue' as any).catch(() => ({ enqueue: null }));
+            if (enqueue) {
+                for (const m of mapped) {
                     try {
-                        await saveListing({ title: m.title, price: Number(m.price) || 0, location: m.location, source: 'scraper', url: m.url, thumbnail: (m as any).thumbnail });
+                        enqueue({ url: m.url, title: m.title, price: Number(m.price) || null, location: m.location || null, description: m.description || null, postal: (m as any).postal || null, lat: (m as any).lat ?? null, lon: (m as any).lon ?? null, source: 'scraper', thumbnail: (m as any).thumbnail || null, images: Array.isArray((m as any).images) ? (m as any).images : null, ts: Date.now() });
                     } catch (e) {
-                        // swallow per-item DB errors
+                        // ignore per-item enqueue errors
                     }
-                }, concurrency);
+                }
             }
         } catch (e) {
-            // ignore persistence failures for now
-            console.warn('[searchMarket] saveToDb failed', e && (e as any).message ? (e as any).message : e);
+            console.warn('[searchMarket] enqueue saveToDb failed', e && (e as any).message ? (e as any).message : e);
         }
     }
 

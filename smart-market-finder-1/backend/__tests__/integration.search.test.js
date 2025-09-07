@@ -10,8 +10,10 @@ jest.setTimeout(60 * 60 * 1000); // 60 minutes
 // Only run the full matrix in NIGHTLY runs. For PRs/normal CI, set NIGHTLY=true to enable.
 if (process.env.NIGHTLY !== 'true') {
   console.log('Skipping full integration matrix (set NIGHTLY=true to run).');
-  // Export a noop so Jest doesn't treat this file as missing tests
-  module.exports = {};
+  // Register a skipped test so Jest treats this file as present but skipped in normal runs
+  describe.skip('nightly integration matrix (skipped)', () => {
+    test('nightly disabled', () => {});
+  });
 } else {
 
 // small helpers: sleep and post with retry/backoff to reduce 429s

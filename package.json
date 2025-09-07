@@ -19,6 +19,7 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
+  "test:integration": "./scripts/test-integration.sh",
   "dev:backend": "ts-node-dev --respawn --transpile-only smart-market-finder-1/backend/src/server.ts",
   "frontend": "cd smart-market-finder-1/frontend && npm start",
   "dev": "node scripts/run-dev.js",

@@ -9,6 +9,7 @@ type Item = {
   date?: string;
   description?: string;
   thumbnail?: string;
+  images?: string[];
 };
 
 export default function ResultsList({ results = [] }: { results?: Item[] }) {
@@ -21,13 +22,37 @@ export default function ResultsList({ results = [] }: { results?: Item[] }) {
     <div className="results-grid">
       {results.map((it, idx) => (
         <article key={(it.url && it.url) || `item-${idx}`} className="card card-grid">
-          <div className="card-media">
-            {it.thumbnail ? (
-              <img src={it.thumbnail} alt={it.title || 'thumbnail'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <div className="thumb">{it.title ? it.title.charAt(0).toUpperCase() : 'A'}</div>
-            )}
-          </div>
+            <div className="card-media">
+              {(() => {
+                // prefer images array first
+                if (Array.isArray(it.images) && it.images.length) {
+                  try {
+                    let s0 = it.images[0] || '';
+                    try { s0 = new URL(s0, it.url || window.location.href).href; } catch { /* keep as-is */ }
+                    return <img src={s0} alt={it.title || 'thumbnail'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />;
+                  } catch (e) { /* ignore and fallback */ }
+                }
+                // then explicit thumbnail
+                if (it.thumbnail) return <img src={it.thumbnail} alt={it.title || 'thumbnail'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />;
+                // try to extract first image URL from HTML description using DOMParser for safety
+                if (it.description) {
+                  try {
+                    const dp = new DOMParser();
+                    const doc = dp.parseFromString(String(it.description), 'text/html');
+                    const img = doc.querySelector('img');
+                    if (img && img.getAttribute('src')) {
+                      let src = img.getAttribute('src') || '';
+                      try { src = new URL(src, it.url || window.location.href).href; } catch { /* keep original src */ }
+                      return <img src={src} alt={it.title || 'thumbnail'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />;
+                    }
+                  } catch (e) {
+                    // ignore
+                  }
+                }
+                // fallback avatar placeholder
+                return <div className="thumb">{it.title ? it.title.charAt(0).toUpperCase() : 'A'}</div>;
+              })()}
+            </div>
           <div className="card-body">
             <div className="card-header">
               {it.url ? (
@@ -37,23 +62,31 @@ export default function ResultsList({ results = [] }: { results?: Item[] }) {
               )}
               <div className="price-badge">{(() => {
                 const p = it.price;
-                if (p == null) return '';
+                // friendly fallback text when price is not present
+                const noPrice = 'Cena neuvedena';
+                if (p == null) return noPrice;
                 // if backend provided numeric price, format with thousands and currency
                 if (typeof p === 'number') {
-                  if (p <= 0) return '';
+                  if (p <= 0) return noPrice;
                   return new Intl.NumberFormat('cs-CZ').format(p) + ' Kč';
                 }
-                // string fallback: show only if it contains explicit currency token or a reasonable number
+                // string fallback: show raw string if it already contains currency
                 const s = String(p || '').trim();
-                if (!s) return '';
+                if (!s) return noPrice;
                 if (/kč|kc|czk/i.test(s)) return s;
-                // accept bare numeric strings >= 10000
+                // accept bare numeric strings and format them if they contain digits
                 const digits = Number(s.replace(/[^0-9]/g, '')) || 0;
-                if (digits >= 10000) return new Intl.NumberFormat('cs-CZ').format(digits) + ' Kč';
-                return '';
+                if (digits > 0) return new Intl.NumberFormat('cs-CZ').format(digits) + ' Kč';
+                // as a last resort, show the original string so it's not silently hidden
+                return s || noPrice;
               })()}</div>
             </div>
-            <div className="card-meta">{it.location}</div>
+            <div className="card-meta">
+              <span>{it.location}</span>
+              {typeof (it as any).distance === 'number' ? (
+                <span style={{ marginLeft: 12, color: '#666', fontSize: 12 }}>{Number(((it as any).distance || 0)).toFixed(1)} km</span>
+              ) : null}
+            </div>
             {it.description ? <p className="card-desc">{it.description}</p> : null}
             <div className="card-actions">
               {it.url ? (

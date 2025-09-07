@@ -3,10 +3,13 @@ export type ScrapeItem = {
   price: string;
   location: string;
   postal?: string;
+  lat?: number;
+  lon?: number;
   url: string;
   date: string;
   description?: string;
   thumbnail?: string;
+  images?: string[];
 };
 
 type ScrapeOpts = {
@@ -133,10 +136,16 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
           }
 
           let thumb = '';
+          let imgs: string[] = [];
           try {
             const img = $a.find('img').first();
             if (img && img.length) { thumb = ($(img).attr('src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} }
             else if (container) { const img2 = container.find('img').first(); if (img2 && img2.length) { thumb = ($(img2).attr('src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} } }
+            // collect up to 4 images from the container as candidates
+            try {
+              const imgsFound = container.find('img').toArray().map((el: any) => ($(el).attr('src') || '').trim()).filter(Boolean).slice(0, 4);
+              imgs = imgsFound.map((u: string) => { try { return new URL(u, base).href; } catch { return u; } });
+            } catch (e) { /* ignore */ }
           } catch (e) { logger.debug('[parseListingsFromHtml] thumb parse error', e && (e as any).message ? (e as any).message : e); }
 
           const item: ScrapeItem = {
@@ -146,7 +155,8 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
             url: href,
             date: new Date().toISOString(),
             description: normalizeText(descText || ''),
-            thumbnail: thumb || ''
+            thumbnail: thumb || '',
+            images: imgs.length ? imgs : (thumb ? [thumb] : [])
           };
           found.push(item);
         } catch (e) {
@@ -167,15 +177,63 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
       const $ = cheerioImpl.load(r.data);
       const metaDesc = ($('meta[property="og:description"]').attr('content') || $('meta[name="description"]').attr('content') || '').trim();
 
+      // If description missing, try to populate it from meta or page content
+      try {
+        const detailDesc = ($('.inzeratydet .popis, .inzerat-popis, .popis, .description, .inzeratydet .description').first().text() || '').trim();
+        if ((!it.description || String(it.description).trim() === '') && detailDesc) {
+          it.description = normalizeText(detailDesc);
+        } else if ((!it.description || String(it.description).trim() === '') && metaDesc) {
+          it.description = normalizeText(metaDesc);
+        }
+      } catch (e) {
+        // ignore per-item description parse errors
+      }
+
       if ((!it.price || !isValidPrice(it.price)) && metaDesc) {
         const c = extractCurrencyFromText(metaDesc);
         if (c) it.price = normalizePrice(c);
       }
 
-      if (!it.thumbnail || it.thumbnail === '') {
+      // Populate og:image and an images[] array of candidate images from the detail page
+      try {
+        // prefer OpenGraph image
         const og = ($('meta[property="og:image"]').attr('content') || $('meta[name="og:image"]').attr('content') || '').trim();
-        if (og) { try { it.thumbnail = new URL(og, it.url).href; } catch { it.thumbnail = og; } }
-        else { const firstImg = $('img').first().attr('src') || ''; if (firstImg) { try { it.thumbnail = new URL(String(firstImg).trim(), it.url).href; } catch { it.thumbnail = String(firstImg).trim(); } } }
+        if (og) {
+          try { it.thumbnail = new URL(og, it.url).href; } catch { it.thumbnail = og; }
+        }
+        // Schema.org / JSON-LD image fields
+        try {
+          const scripts = $('script[type="application/ld+json"]').toArray();
+          for (const s of scripts) {
+            try {
+              const txt = $(s).text(); if (!txt) continue;
+              const j = JSON.parse(txt);
+              const obj = Array.isArray(j) ? j[0] : j;
+              if (obj && obj.image) {
+                if (typeof obj.image === 'string') {
+                  const u = obj.image.trim(); if (u) { try { it.thumbnail = new URL(u, it.url).href; } catch { it.thumbnail = u; } }
+                } else if (Array.isArray(obj.image) && obj.image.length) {
+                  const u = String(obj.image[0]).trim(); if (u) { try { it.thumbnail = new URL(u, it.url).href; } catch { it.thumbnail = u; } }
+                }
+              }
+            } catch (e) { /* ignore per-script */ }
+          }
+        } catch (e) { /* ignore */ }
+
+        // Collect up to 12 <img> candidates and normalize to absolute URLs
+        const imgsOnPage = $('img').toArray().map((el: any) => ($(el).attr('src') || $(el).attr('data-src') || '').trim()).filter(Boolean).slice(0, 12).map((u: string) => { try { return new URL(u, it.url).href; } catch { return u; } });
+        if (!it.images) it.images = [];
+        for (const u of imgsOnPage) {
+          if (u && !it.images.includes(u) && !u.startsWith('data:')) it.images.push(u);
+        }
+        // If thumbnail not set yet, choose best candidate: prefer og, then first schema image, then largest filename heuristic
+        if ((!it.thumbnail || it.thumbnail === '') && it.images && it.images.length) {
+          // heuristic: prefer images that do not contain 'icon', 'sprite', 'logo' and are not very small-looking (filename length heuristic)
+          const good = it.images.filter(u => !/icon|sprite|logo|avatar/i.test(u));
+          if (good.length) it.thumbnail = good[0]; else it.thumbnail = it.images[0];
+        }
+      } catch (e) {
+        // ignore image parsing errors
       }
 
       if ((!it.location || it.location.trim() === '') && metaDesc) {
@@ -198,11 +256,63 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
         }
       } catch (e) { /* ignore */ }
 
+      // Try to discover coordinates on detail page: common patterns - meta geo tags, data-lat/data-lon, or JSON-LD
+      try {
+        // meta geo.position or geo.position meta tags
+        const metaGeo = (($('meta[name="geo.position"]').attr('content') || $('meta[name="ICBM"]').attr('content') || '') as string).trim();
+        if (metaGeo && /[0-9\.\-]+\s*[,\s]\s*[0-9\.\-]+/.test(metaGeo)) {
+          const parts = metaGeo.split(/[ ,]+/).map((s: string) => parseFloat(String(s)));
+          if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { it.lat = parts[0]; it.lon = parts[1]; }
+        }
+      } catch (e) { /* ignore */ }
+      try {
+        // data attributes on map elements
+        const mapEl = $('[data-lat][data-lon]').first();
+        if (mapEl && mapEl.length) {
+          const latAttr = mapEl.attr('data-lat'); const lonAttr = mapEl.attr('data-lon');
+          const latN = latAttr ? Number(String(latAttr).replace(',', '.')) : NaN; const lonN = lonAttr ? Number(String(lonAttr).replace(',', '.')) : NaN;
+          if (!isNaN(latN) && !isNaN(lonN)) { it.lat = latN; it.lon = lonN; }
+        }
+      } catch (e) { /* ignore */ }
+      try {
+        // Try JSON-LD with @type: Place or GeoCoordinates; also look for offers/price
+        const scripts = $('script[type="application/ld+json"]').toArray();
+        for (const s of scripts) {
+          try {
+            const txt = $(s).text(); if (!txt) continue;
+            const j = JSON.parse(txt);
+            const obj = Array.isArray(j) ? j[0] : j;
+            if (obj && obj['@type'] && (obj['@type'] === 'Place' || obj['@type'] === 'Product' || obj['@type'] === 'Offer')) {
+              const geo = obj.geo || obj['geo'] || (obj['hasMap'] && obj['hasMap'].geo) || null;
+              if (geo && geo.latitude && geo.longitude) {
+                const latN = Number(geo.latitude); const lonN = Number(geo.longitude);
+                if (!isNaN(latN) && !isNaN(lonN)) { it.lat = latN; it.lon = lonN; break; }
+              }
+            }
+            if (obj && obj['@type'] === 'GeoCoordinates' && obj.latitude && obj.longitude) {
+              const latN = Number(obj.latitude); const lonN = Number(obj.longitude);
+              if (!isNaN(latN) && !isNaN(lonN)) { it.lat = latN; it.lon = lonN; break; }
+            }
+            // Try to read price from JSON-LD offers
+            if ((!it.price || it.price === '') && obj && (obj.offers || obj.price || obj.priceSpecification)) {
+              try {
+                const priceVal = obj.price || (obj.offers && (obj.offers.price || (obj.offers[0] && obj.offers[0].price))) || (obj.priceSpecification && obj.priceSpecification.price);
+                const currency = (obj.offers && obj.offers.priceCurrency) || obj.priceCurrency || (obj.offers && obj.offers[0] && obj.offers[0].priceCurrency) || '';
+                if (priceVal) it.price = String(priceVal) + (currency ? (' ' + currency) : '');
+              } catch (e) { /* ignore */ }
+            }
+          } catch (e) { /* ignore per-script */ }
+        }
+      } catch (e) { /* ignore */ }
+
       try {
         const tbodyPriceRow = $('tbody tr').filter((i: number, el: any) => { return ($(el).find('td').first().text() || '').trim().startsWith('Cena'); }).first();
         if (tbodyPriceRow && tbodyPriceRow.length) {
           const pb = tbodyPriceRow.find('b').first().text().trim(); if (pb) it.price = normalizePrice(pb.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim());
         }
+        // meta price tags
+        const metaPrice = ($('meta[itemprop="price"]').attr('content') || $('meta[property="product:price:amount"]').attr('content') || $('meta[name="price"]').attr('content') || '').trim();
+        if ((!it.price || it.price === '') && metaPrice) it.price = normalizePrice(metaPrice);
       } catch (e) { /* ignore */ }
 
       if ((!it.price || !isValidPrice(it.price))) {
@@ -223,17 +333,50 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
       const cheerio = await import('cheerio').then(m => (m && (m as any).default) ? (m as any).default : m).catch(() => null);
       if (!axios || !cheerio) return items;
       const toFetch = items.map((it, idx) => ({ it, idx })).filter(x => {
-        const p = String(x.it.price || '').trim(); const l = String(x.it.location || '').trim(); return !isValidPrice(p) || !l || x.it.thumbnail === '';
+        const p = String(x.it.price || '').trim();
+        const l = String(x.it.location || '').trim();
+        const d = String(x.it.description || '').trim();
+        // fetch details when price/location/thumbnail missing or when description is empty
+        return !isValidPrice(p) || !l || !x.it.thumbnail || x.it.thumbnail === '' || d === '';
       });
       if (toFetch.length === 0) return items;
       const batchSize = Math.max(1, concurrency);
+      // helper to GET with retries (simple exponential backoff)
+      const fetchWithRetries = async (url: string, attempts = 2, timeout = 8000) => {
+        let lastErr: any = null;
+        for (let a = 0; a < attempts; a++) {
+          try {
+            return await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout });
+          } catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 200 * Math.pow(2, a))); }
+        }
+        throw lastErr;
+      };
+
       for (let i = 0; i < toFetch.length; i += batchSize) {
         const batch = toFetch.slice(i, i + batchSize);
-        await Promise.all(batch.map(async b => {
+        const promises = batch.map(async b => {
           try {
+            // try a quick fetch first (with retries), then parse using fetchDetailPage
+            try {
+              const resp = await fetchWithRetries(b.it.url, 2, 8000).catch(() => null);
+              if (resp && resp.data) {
+                // temporarily wrap axios.get to return the fetched HTML so fetchDetailPage reuses parsing logic
+                const savedGet = axios.get;
+                axios.get = async () => ({ data: resp.data });
+                try { const updated = await fetchDetailPage(b.it, axios, cheerio); items[b.idx] = updated; }
+                finally { axios.get = savedGet; }
+                return;
+              }
+            } catch (e) {
+              logger.debug('[fetchDetailsInBatches] quick fetch failed', e && (e as any).message ? (e as any).message : e);
+            }
+            // fallback: call fetchDetailPage which itself does an HTTP GET and parsing
             const updated = await fetchDetailPage(b.it, axios, cheerio); items[b.idx] = updated;
-          } catch (e) { logger.debug('[fetchDetailsInBatches] item fetch failed', e && (e as any).message ? (e as any).message : e); }
-        }));
+          } catch (e) {
+            logger.debug('[fetchDetailsInBatches] item fetch failed', e && (e as any).message ? (e as any).message : e);
+          }
+        });
+        await Promise.all(promises);
       }
     } catch (e) { logger.error('[fetchDetailsInBatches] error', e && (e as any).message ? (e as any).message : e); }
     return items;

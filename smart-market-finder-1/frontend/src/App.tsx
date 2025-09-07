@@ -15,7 +15,7 @@ const App: React.FC = () => {
     <Router>
       <div className="App">
         <Header />
-        <main style={{ paddingTop: 84 }}>
+  <main>
           <div className="container">
             <BackendStatus />
             <Routes>

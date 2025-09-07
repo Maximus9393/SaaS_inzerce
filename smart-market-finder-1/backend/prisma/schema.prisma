@@ -12,8 +12,13 @@ model Listing {
   title     String
   price     Float
   location  String?
+  description String?
+  postal    String?
+  lat       Float?
+  lon       Float?
   source    String   @db.VarChar(64)
   url       String   @unique
   thumbnail String?
+  images    Json?
   createdAt DateTime @default(now())
 }
