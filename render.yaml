@@ -14,8 +14,8 @@ services:
   # set to your Render managed Postgres connection string
   value: "postgresql://databaze_saas_inzerce_user:g0el0uVQpT1cjkdMF4B4bX1vrD8wIP5W@dpg-d2ut8cje5dus73f4h6v0-a.frankfurt-postgres.render.com/databaze_saas_inzerce"
       - key: REDIS_URL
-        # optional: set to your Redis URL
-        value: ""
+  # optional: set to your Redis URL
+  value: "rediss://default:AdmPAAIncDE5ODhmMWNlNzZkYzI0MzVlODkzYWEzYTAzYzYzMThjNXAxNTU2OTU@master-prawn-55695.upstash.io:6379"
       - key: MEILI_HOST
         # optional: http://host:7700
         value: ""
