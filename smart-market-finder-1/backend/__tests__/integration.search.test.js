@@ -96,7 +96,6 @@ describe('integration: frontend + /api/search', () => {
     queries.forEach((q) => {
       test(`${city} - ${q}`, async () => {
         const payload = { location: city, keywords: q, limit: 10 };
-        // small pause between tests to avoid hammering target site
         await sleep(500);
         const res = await postWithRetry(baseUrl + '/api/search', payload, { maxAttempts: 4, baseDelay: 4000, timeout: 180000 });
         expect(res.status).toBe(200);
@@ -112,6 +111,45 @@ describe('integration: frontend + /api/search', () => {
         }
       });
     });
+  });
+
+  // Komplexní relevance test for one city/query
+  test('relevance: Praha - octavia 1.9 tdi', async () => {
+    const payload = { location: 'Praha', keywords: 'octavia 1.9 tdi', limit: 10, sort: 'distance', order: 'asc' };
+    const res = await postWithRetry(baseUrl + '/api/search', payload, { maxAttempts: 4, baseDelay: 4000, timeout: 180000 });
+    expect(res.status).toBe(200);
+    expect(res.data).toHaveProperty('results');
+    const results = res.data.results;
+    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(0);
+
+    // Check that top results are relevant: title/desc contains keywords
+    const keywords = ['octavia', 'tdi', '1.9'];
+    const top = results.slice(0, 5);
+    top.forEach(r => {
+      const text = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
+      const matches = keywords.filter(k => text.includes(k));
+      expect(matches.length).toBeGreaterThanOrEqual(2); // at least 2 keywords present
+      expect(r.price).toBeGreaterThan(10000); // realistic price
+      expect(r.location).toMatch(/praha/i);
+      expect(r.url).toMatch(/^https?:\/\//);
+      expect(r.images).toBeDefined();
+      expect(r.thumbnail || r.images.length > 0).toBeTruthy();
+      expect(typeof r.distance === 'number').toBe(true);
+      expect(r.distance).toBeLessThan(100); // should be within 100km
+    });
+
+    // Check sorting by distance (ascending)
+    for (let i = 1; i < top.length; ++i) {
+      expect(top[i].distance).toBeGreaterThanOrEqual(top[i-1].distance);
+    }
+
+    // Check that irrelevant results (missing keywords, far away) are not present in top 5
+    const irrelevant = results.filter(r => {
+      const text = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
+      return !keywords.some(k => text.includes(k)) || (r.distance && r.distance > 200);
+    });
+    expect(irrelevant.length).toBeLessThan(results.length / 2);
   });
 });
 

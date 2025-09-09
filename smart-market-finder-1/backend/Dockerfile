@@ -70,6 +70,8 @@ COPY --from=builder /app/src/utils/psc.json ./dist/src/utils/psc.json
 COPY --from=builder /app/frontend/build /frontend/build
 # copy prisma schema/migrations so runtime can run migrations
 COPY --from=builder /app/prisma /app/prisma
+# copy runtime scripts (indexer, importers) into image
+COPY --from=builder /app/scripts /app/scripts
 
 ENV NODE_ENV=production
 ENV PORT=3000

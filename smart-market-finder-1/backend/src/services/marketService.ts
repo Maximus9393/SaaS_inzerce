@@ -1,6 +1,6 @@
 import { MarketResult } from '../models/market';
 import { postalToCoords, cityToCoords, haversine } from '../utils/geo';
-import { scrapeBazos, ScrapeItem } from '../scraper/scraper';
+import { scrape, ScrapeItem } from '../scraper/scraper';
 import lookupPostalPrefixes, { suggestPostal, PostalSuggestion } from '../utils/postalLookup';
 import { redisGet, redisSet } from '../utils/redisClient';
 
@@ -150,7 +150,10 @@ const runMeiliSearch = async (q: string, rawLocation: string, isPostalLike: bool
 // Run a single scraper invocation and return deduped results
 const runScraper = async (options: any, dedupeAfter = true): Promise<ScrapeItem[]> => {
     try {
-        const items = await scrapeBazos(options);
+    // dynamic import: prefer top-level `scrape` aggregator but fall back to individual scraper exports
+    const scraperMod: any = await import('../scraper/scraper' as any).catch(() => ({}));
+    const scrapeFn = scraperMod.scrape || scraperMod.scrapeBazos || scraperMod.scrapeSauto || scraperMod.scrapeCars || null;
+    const items = scrapeFn ? await scrapeFn(options) : [];
         if (!Array.isArray(items)) return [];
         if (dedupeAfter) return deduplicateResults(items) as ScrapeItem[];
         return items;
@@ -364,19 +367,60 @@ export const searchMarket = async (criteria: SearchCriteria): Promise<MarketResu
         // ignore redis errors
     }
 
-    // 1) Try Meili (fast path)
+    // 1) Try Meili and scraper in parallel and prefer first non-empty response to improve perceived latency.
     try {
-        const meiliRes = await runMeiliSearch(keywords, rawLocation, isPostalLike);
-        if (Array.isArray(meiliRes) && meiliRes.length) {
-            lastResultsCache = meiliRes.slice(0, pageSize);
-            return lastResultsCache;
+        const meiliPromise = runMeiliSearch(keywords, rawLocation, isPostalLike).catch(() => null);
+        // run a focused scraper in parallel (small pageSize) to get live results
+        const scraperPromise = (async () => {
+            if (!rawLocation) return await runScraper({ keywords, location: '', strictLocation: strict, limit: pageSize }, true);
+            if (isPostalLike) {
+                const useLoc = numericClean.length >= 5 ? numericClean : numericClean.slice(0, 3);
+                return await runScraper({ keywords, location: useLoc, strictLocation: strict, wantIsPostal: true, limit: pageSize }, true);
+            }
+            // city name: run relaxed scraper first
+            return await runScraper({ keywords, location: rawLocation, strictLocation: false, limit: pageSize }, true);
+        })().catch(() => [] as any[]);
+
+        // helper: promise that resolves only if non-empty, otherwise rejects so Promise.any can pick the first non-empty
+        const nonEmpty = (p: Promise<any[] | null>) => new Promise<any[]>((resolve, reject) => {
+            p.then(r => { if (Array.isArray(r) && r.length) resolve(r as any[]); else reject(r); }).catch(reject);
+        });
+        let winner: any[] | null = null;
+        try {
+            // Race the non-empty promises; the first to resolve with a non-empty array wins.
+            const raced = await Promise.race([nonEmpty(scraperPromise), nonEmpty(meiliPromise)]);
+            winner = raced as any[];
+        } catch (e) {
+            // none produced non-empty quickly; await both and merge/fallback
+            const [sRes, mRes] = await Promise.all([scraperPromise, meiliPromise.catch(() => null)]);
+            if (Array.isArray(sRes) && sRes.length) winner = sRes as any[];
+            else if (Array.isArray(mRes) && mRes.length) winner = mRes as any[];
+            else winner = [];
+        }
+
+        if (winner && winner.length) {
+            // If winner items look like Meili hits (already MarketResult-like) or scraper items
+            // Ensure mapping to MarketResult if they are ScrapeItem
+            let finalResults: MarketResult[] = [];
+            // detect if items are ScrapeItem (have url/title) and not already MarketResult with price number
+            const maybeScrape = (winner as any[]).some(i => i && (i.title || i.url));
+            if (maybeScrape) {
+                // if items contain price as number it's likely MarketResult; else map scrape items
+                finalResults = mapScrapeItemsToMarketResults(winner as any[], pageSize);
+            } else {
+                // assume Meili results already shaped
+                finalResults = (winner as MarketResult[]).slice(0, pageSize);
+            }
+            lastResultsCache = finalResults;
+            // best-effort: store in redis
+            try { await redisSet(cacheKey, JSON.stringify(finalResults), cacheTTL); } catch (e) { }
+            return finalResults;
         }
     } catch (e) {
-        // log and continue to scraper
-        console.warn('[searchMarket] meili fallback', e && (e as any).message ? (e as any).message : e);
+        console.warn('[searchMarket] parallel meili/scraper error', e && (e as any).message ? (e as any).message : e);
     }
 
-    // 2) Prepare scraper runs depending on input
+    // 2) Prepare scraper runs depending on input (fallback path)
     let aggregated: ScrapeItem[] = [];
 
     if (!rawLocation) {

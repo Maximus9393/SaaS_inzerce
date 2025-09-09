@@ -1,0 +1,955 @@
+{
+  "runAt": "2025-09-05T11:41:32.747Z",
+  "results": [
+    {
+      "city": "Praha",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Praha",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Praha",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Praha",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Praha",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Praha",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Praha",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Praha",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Praha",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Praha",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Brno",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Brno",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Brno",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Brno",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Brno",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Brno",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Brno",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Brno",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Brno",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Brno",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Ostrava",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Ostrava",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Ostrava",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Ostrava",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Ostrava",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Ostrava",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Ostrava",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Ostrava",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Ostrava",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Ostrava",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Plzeň",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Plzeň",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Plzeň",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Plzeň",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Plzeň",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Plzeň",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Plzeň",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Plzeň",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Plzeň",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Plzeň",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Liberec",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Liberec",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Liberec",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Liberec",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Liberec",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Liberec",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Liberec",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Liberec",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Liberec",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Liberec",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Olomouc",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Olomouc",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Olomouc",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Olomouc",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Olomouc",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Olomouc",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Olomouc",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Olomouc",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Olomouc",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Olomouc",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Hradec Králové",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Hradec Králové",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Hradec Králové",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Hradec Králové",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Hradec Králové",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Pardubice",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Pardubice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Pardubice",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Pardubice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Pardubice",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Pardubice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Pardubice",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Pardubice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Pardubice",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Pardubice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Zlín",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "Zlín",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Zlín",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "Zlín",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Zlín",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "Zlín",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Zlín",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "Zlín",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "Zlín",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "Zlín",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "České Budějovice",
+      "query": "octavia 1.9 tdi",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock octavia 1.9 tdi",
+          "location": "České Budějovice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "České Budějovice",
+      "query": "bmw 320d",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock bmw 320d",
+          "location": "České Budějovice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "České Budějovice",
+      "query": "audi a3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock audi a3",
+          "location": "České Budějovice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "České Budějovice",
+      "query": "peugeot 206",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock peugeot 206",
+          "location": "České Budějovice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    },
+    {
+      "city": "České Budějovice",
+      "query": "citroen c3",
+      "count": 1,
+      "thumbs": 0,
+      "withDesc": 1,
+      "withPostal": 0,
+      "withCoords": 0,
+      "avgDescLen": 32,
+      "avgDistance": null,
+      "sample": [
+        {
+          "title": "Mock citroen c3",
+          "location": "České Budějovice",
+          "distance": null,
+          "thumb": false
+        }
+      ]
+    }
+  ]
+}

@@ -3,8 +3,10 @@ set -e
 
 echo "[start.sh] container startup: begin"
 
-# Generate Prisma client (safe even without DB)
+# Path to prisma schema inside the image
 SCHEMA_PATH="/app/prisma/schema.prisma"
+
+# Generate Prisma client (safe even without DB)
 if [ -f "$SCHEMA_PATH" ]; then
   echo "[start.sh] found prisma schema at $SCHEMA_PATH"
   echo "[start.sh] running: npx prisma generate --schema=$SCHEMA_PATH"
@@ -32,9 +34,6 @@ if [ -n "$DATABASE_URL" ]; then
         break
       fi
     fi
-      echo "[start.sh] prisma migrate deploy succeeded"
-      break
-    fi
     i=$((i+1))
     echo "[start.sh] prisma migrate deploy failed — retry $i/$MAX_RETRIES after ${SLEEP_SECS}s"
     sleep "$SLEEP_SECS"
@@ -47,36 +46,16 @@ else
 fi
 
 echo "[start.sh] starting node server: node dist/server.js"
-exec node dist/server.js
-#!/usr/bin/env sh
-set -e
-
-# Small startup script to ensure Prisma client is generated and migrations applied (if DATABASE_URL present).
-# It retries a few times to allow dependent services (DB) to be up when running in render/docker.
-
-MAX_RETRIES=6
-SLEEP=5
-
-echo "Generating Prisma client..."
-# generate client (no failure if not needed)
-npx prisma generate || true
-
-if [ -n "$DATABASE_URL" ]; then
-  echo "DATABASE_URL detected, attempting prisma migrate..."
-  i=0
-  until [ $i -ge $MAX_RETRIES ]
-  do
-    if npx prisma migrate deploy; then
-      echo "Prisma migrate deploy succeeded"
-      break
-    fi
-    i=$((i+1))
-    echo "Prisma migrate failed, retrying in $SLEEP seconds... ($i/$MAX_RETRIES)"
-    sleep $SLEEP
-  done
-else
-  echo "No DATABASE_URL provided; skipping prisma migrate"
+# start optional background workers
+if [ -f /app/dist/worker/persistWorker.js ]; then
+  echo "[start.sh] starting persistWorker in background"
+  nohup node /app/dist/worker/persistWorker.js > /var/log/persistWorker.log 2>&1 &
 fi
 
-echo "Starting server..."
+if [ -n "$MEILI_HOST" ] && [ -f /app/scripts/meili_sync_loop.js ]; then
+  echo "[start.sh] MEILI_HOST detected — starting meili sync loop in background"
+  nohup node /app/scripts/meili_sync_loop.js > /var/log/meili_sync_loop.log 2>&1 &
+fi
+
+# start main server
 exec node dist/server.js

@@ -1,0 +1,57 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: smart
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.1.1
+    environment:
+      MEILI_MASTER_KEY: masterKey
+    ports:
+      - '7700:7700'
+    volumes:
+      - meili_data:/data.ms
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://demo:demo@postgres:5432/smart
+      - REDIS_URL=redis://redis:6379
+      - MEILI_HOST=http://meilisearch:7700
+      - MEILI_KEY=masterKey
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+      - redis
+      - meilisearch
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000
+    ports:
+      - '3002:3002'
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  meili_data:

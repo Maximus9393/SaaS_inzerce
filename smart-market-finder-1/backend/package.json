@@ -16,6 +16,7 @@
     "import:sauto": "ts-node scripts/import_sauto.ts",
     "import:tipcars": "ts-node scripts/import_tipcars.ts",
     "import:csv": "ts-node scripts/import_csv.ts"
+  ,"index:meili": "node scripts/index_meili.js"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

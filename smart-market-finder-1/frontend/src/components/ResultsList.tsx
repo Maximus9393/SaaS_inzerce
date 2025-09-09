@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import Spinner from './Spinner';
+import formatPrice from '../utils/formatPrice';
 
 type Item = {
   title?: string;
@@ -12,7 +15,8 @@ type Item = {
   images?: string[];
 };
 
-export default function ResultsList({ results = [] }: { results?: Item[] }) {
+export default function ResultsList({ results = [], loading = false }: { results?: Item[]; loading?: boolean }) {
+  if (loading) return <Spinner><div style={{ minHeight: 200 }} /></Spinner>;
   if (!results || results.length === 0) return (
     <div className="no-results">
       <p>Žádné inzeráty aut nebyly nalezeny.</p>
@@ -56,30 +60,12 @@ export default function ResultsList({ results = [] }: { results?: Item[] }) {
           <div className="card-body">
             <div className="card-header">
               {it.url ? (
-                <a className="card-title" href={it.url} target="_blank" rel="noopener noreferrer">{it.title}</a>
+                // navigate to our internal listing detail page and pass the item via router state
+                <Link className="card-title" to={`/listing?url=${encodeURIComponent(String(it.url || ''))}`} state={{ item: it }}>{it.title}</Link>
               ) : (
                 <span className="card-title">{it.title}</span>
               )}
-              <div className="price-badge">{(() => {
-                const p = it.price;
-                // friendly fallback text when price is not present
-                const noPrice = 'Cena neuvedena';
-                if (p == null) return noPrice;
-                // if backend provided numeric price, format with thousands and currency
-                if (typeof p === 'number') {
-                  if (p <= 0) return noPrice;
-                  return new Intl.NumberFormat('cs-CZ').format(p) + ' Kč';
-                }
-                // string fallback: show raw string if it already contains currency
-                const s = String(p || '').trim();
-                if (!s) return noPrice;
-                if (/kč|kc|czk/i.test(s)) return s;
-                // accept bare numeric strings and format them if they contain digits
-                const digits = Number(s.replace(/[^0-9]/g, '')) || 0;
-                if (digits > 0) return new Intl.NumberFormat('cs-CZ').format(digits) + ' Kč';
-                // as a last resort, show the original string so it's not silently hidden
-                return s || noPrice;
-              })()}</div>
+              <div className="price-badge">{formatPrice(it.price)}</div>
             </div>
             <div className="card-meta">
               <span>{it.location}</span>
@@ -90,7 +76,10 @@ export default function ResultsList({ results = [] }: { results?: Item[] }) {
             {it.description ? <p className="card-desc">{it.description}</p> : null}
             <div className="card-actions">
               {it.url ? (
-                <a className="button" href={it.url} target="_blank" rel="noopener noreferrer">Zobrazit</a>
+                <>
+                  <Link className="button" to={`/listing?url=${encodeURIComponent(String(it.url || ''))}`} state={{ item: it }}>Zobrazit</Link>
+                  <a className="button button-ghost" href={it.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>Zdroj</a>
+                </>
               ) : null}
             </div>
           </div>

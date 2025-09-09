@@ -5,6 +5,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import AddAd from './pages/AddAd';
 import Subscribe from './pages/Subscribe';
+import Listing from './pages/Listing';
 import './styles/tokens.css';
 import './styles/main.css';
 import BackendStatus from './components/BackendStatus';
@@ -20,6 +21,7 @@ const App: React.FC = () => {
             <BackendStatus />
             <Routes>
               <Route path="/" element={<Home />} />
+                <Route path="/listing" element={<Listing />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/add" element={<AddAd />} />

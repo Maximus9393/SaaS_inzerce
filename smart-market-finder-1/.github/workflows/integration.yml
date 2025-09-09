@@ -1,0 +1,38 @@
+name: integration-tests
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24.0.2
+        options: --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        uses: docker/setup-buildx-action@v2
+
+      - name: Start stack
+        run: |
+          docker compose -f docker-compose.backend.yml up -d --build
+
+      - name: Wait for backend
+        run: |
+          n=0; until curl -sS http://localhost:3000/ || [ $n -ge 30 ]; do n=$((n+1)); sleep 2; done; if [ $n -ge 30 ]; then docker compose -f docker-compose.backend.yml logs --tail=200; exit 1; fi
+
+      - name: Run backend tests
+        working-directory: backend
+        run: |
+          npm ci
+          npm test -- -i
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.backend.yml down --volumes --remove-orphans

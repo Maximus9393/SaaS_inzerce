@@ -4,14 +4,15 @@ const MEILI_HOST = process.env.MEILI_HOST || 'http://127.0.0.1:7700';
 const MEILI_KEY = process.env.MEILI_KEY || '';
 
 const client = new MeiliSearch({ host: MEILI_HOST, apiKey: MEILI_KEY });
-const INDEX = 'rss_items';
+const INDEX = process.env.MEILI_INDEX || 'listings';
 
 export async function ensureIndex() {
   try {
-    const idx = await client.getIndex(INDEX);
-    return idx;
+    // ensure index exists; return the index instance
+    try { await client.getIndex(INDEX); } catch (e) { await client.createIndex(INDEX, { primaryKey: 'id' }); }
+    return client.index(INDEX);
   } catch (e) {
-    return client.createIndex(INDEX, { primaryKey: 'id' });
+    throw e;
   }
 }
 

@@ -1,0 +1,255 @@
+{
+  "runAt": "2025-09-04T18:48:22.793Z",
+  "results": [
+    {
+      "city": "Praha",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Praha",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Praha",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Praha",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Praha",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Brno",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Brno",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Brno",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Brno",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Brno",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Ostrava",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Ostrava",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Ostrava",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Ostrava",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Ostrava",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Plzeň",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Plzeň",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Plzeň",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Plzeň",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Plzeň",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Liberec",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Liberec",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Liberec",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Liberec",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Liberec",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Olomouc",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Olomouc",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Olomouc",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Olomouc",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Olomouc",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Hradec Králové",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Pardubice",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Pardubice",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Pardubice",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Pardubice",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Pardubice",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "Zlín",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "Zlín",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "Zlín",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "Zlín",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "Zlín",
+      "query": "citroen c3",
+      "error": ""
+    },
+    {
+      "city": "České Budějovice",
+      "query": "octavia 1.9 tdi",
+      "error": ""
+    },
+    {
+      "city": "České Budějovice",
+      "query": "bmw 320d",
+      "error": ""
+    },
+    {
+      "city": "České Budějovice",
+      "query": "audi a3",
+      "error": ""
+    },
+    {
+      "city": "České Budějovice",
+      "query": "peugeot 206",
+      "error": ""
+    },
+    {
+      "city": "České Budějovice",
+      "query": "citroen c3",
+      "error": ""
+    }
+  ]
+}

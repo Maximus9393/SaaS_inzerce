@@ -7,6 +7,12 @@ import { errorHandler } from './middleware/errorHandler';
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// Honor TRUST_PROXY env var to configure express 'trust proxy' when running behind proxies
+try {
+  const tp = String(process.env.TRUST_PROXY || '').toLowerCase();
+  if (tp === '1' || tp === 'true') app.set('trust proxy', true);
+} catch (e) { /* ignore */ }
+
 // parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

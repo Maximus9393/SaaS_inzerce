@@ -1,19 +1,36 @@
 import React, { useState } from 'react';
-import SearchForm from '../components/SearchForm';
 import ResultsList from '../components/ResultsList';
-import DashboardHero from '../components/DashboardHero';
-import { searchMarket, getResults } from '../services/api';
+import AnimatedSearch from '../components/AnimatedSearch';
+import { getResults, triggerSearch } from '../services/api';
 
 const Home: React.FC = () => {
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<any[]>([]);
     const [visibleCount, setVisibleCount] = useState(10);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const [loading, setLoading] = useState(false);
     const handleSearch = async (searchCriteria: any) => {
-        // Call the API to search for market results
-        const payload = Object.assign({ limit: itemsPerPage }, searchCriteria);
-        const data = await searchMarket(payload);
-        setResults(data.results || data);
+        setLoading(true);
+        try {
+            const payload = Object.assign({ limit: itemsPerPage }, searchCriteria);
+            // show currently stored results immediately
+            try { const cur = await getResults(); setResults(cur.results || cur || []); } catch (e) { /* ignore */ }
+            // trigger backend search in background (short client timeout)
+            try { triggerSearch(payload, 2000); } catch (e) { /* ignore */ }
+
+            // Poll for up to 10s to see if stored results appeared/updated
+            const deadline = Date.now() + 10000;
+            while (Date.now() < deadline) {
+                await new Promise(r => setTimeout(r, 1000));
+                try {
+                    const next = await getResults();
+                    const resArr = next.results || next || [];
+                    if (Array.isArray(resArr) && resArr.length) { setResults(resArr); break; }
+                } catch (e) { /* ignore and continue polling */ }
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     // load last results on mount
@@ -36,15 +53,14 @@ const Home: React.FC = () => {
     };
 
     return (
-                <div className="container minimal-center">
-                        <header className="app-header">
-                                <h1>Vyhledávač aut</h1>
-                        </header>
-                        <div className="search-wrap">
-                            <SearchForm onSearch={handleSearch} />
-                        </div>
-                        <ResultsList results={results} />
-                </div>
+        <div className="container minimal-center">
+            <h1 style={{ margin: '8px 0 6px 0' }}>Vyhledávání</h1>
+            <div className="search-wrap hero-search" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <AnimatedSearch onSearch={handleSearch}>
+                    <ResultsList results={results} loading={loading} />
+                </AnimatedSearch>
+            </div>
+        </div>
     );
 };
 

@@ -1,0 +1,453 @@
+
+> smart-market-finder@1.0.0 start
+> react-scripts start
+
+(node:158642) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:158642) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled successfully!
+
+You can now view smart-market-finder in the browser.
+
+  Local:            http://localhost:3001
+  On Your Network:  http://10.0.10.178:3001
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+assets by path static/js/*.js 2.13 MiB
+  asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+  asset static/js/vendors-node_modules_dompurify_dist_purify_es_mjs.chunk.js 61.6 KiB [emitted] (id hint: vendors) 1 related asset
+asset index.html 699 bytes [emitted]
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.06 MiB (javascript) 31.5 KiB (runtime) [cached] 177 modules
+webpack 5.101.3 compiled successfully in 1589 ms
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+(node:158642) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.1 MiB [emitted]
+  assets by chunk 2.1 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.2d01a0df36d2dcc2dbc6.hot-update.js 27.8 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.2d01a0df36d2dcc2dbc6.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.1 MiB (2.11 MiB) = static/js/bundle.js 2.07 MiB main.2d01a0df36d2dcc2dbc6.hot-update.js 27.8 KiB 2 auxiliary assets
+cached modules 2.04 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 25.4 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 1048 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.1 MiB [emitted]
+  assets by chunk 2.1 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.15a224b22f1f71214198.hot-update.js 27.8 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.15a224b22f1f71214198.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.1 MiB (2.11 MiB) = static/js/bundle.js 2.07 MiB main.15a224b22f1f71214198.hot-update.js 27.8 KiB 2 auxiliary assets
+cached modules 2.04 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 25.4 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 243 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 2.13 MiB [cached] 3 assets
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.04 MiB (javascript) 31.5 KiB (runtime) [cached] 176 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 25.4 KiB [built]
+webpack 5.101.3 compiled successfully in 145 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.1 MiB [emitted]
+  assets by chunk 2.1 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.522283fd11161d7969e7.hot-update.js 28.6 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.522283fd11161d7969e7.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.1 MiB (2.11 MiB) = static/js/bundle.js 2.07 MiB main.522283fd11161d7969e7.hot-update.js 28.6 KiB 2 auxiliary assets
+cached modules 2.04 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 26.1 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 414 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 2.13 MiB [cached] 3 assets
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.04 MiB (javascript) 31.5 KiB (runtime) [cached] 176 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 26.1 KiB [built]
+webpack 5.101.3 compiled successfully in 112 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.5438c4cc585e3990f605.hot-update.js 5.45 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.5438c4cc585e3990f605.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.07 MiB main.5438c4cc585e3990f605.hot-update.js 5.45 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./src/pages/Home.tsx 3.16 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 2181 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.1 MiB [emitted]
+  assets by chunk 2.1 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.46ff041d907e4927feb8.hot-update.js 29.8 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.46ff041d907e4927feb8.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.1 MiB (2.11 MiB) = static/js/bundle.js 2.07 MiB main.46ff041d907e4927feb8.hot-update.js 29.8 KiB 2 auxiliary assets
+cached modules 2.04 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 27.3 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 237 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 2.13 MiB [cached] 3 assets
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.05 MiB (javascript) 31.5 KiB (runtime) [cached] 176 modules
+./src/components/SearchForm.tsx 11 KiB [built]
+webpack 5.101.3 compiled successfully in 310 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.61b67fcfbb600c307835.hot-update.js 6.59 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.61b67fcfbb600c307835.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.07 MiB main.61b67fcfbb600c307835.hot-update.js 6.59 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/tokens.css 4.17 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 201 ms
+No issues found.
+Compiling...
+Failed to compile.
+
+Syntax error: /workspaces/SaaS_inzerce/smart-market-finder-1/frontend/src/styles/main.css Unclosed block (103:5)
+  101 | .card-actions { margin-top: auto }
+  102 | 
+> 103 |     .card {
+      |     ^
+  104 |         transition: transform 220ms cubic-bezier(.16,.84,.24,1), box-shadow 220ms cubic-bezier(.16,.84,.24,1);
+  105 | .card-actions .button { padding:8px 12px }
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.05 MiB [emitted]
+  assets by chunk 2.05 MiB (name: main)
+    asset static/js/bundle.js 2.04 MiB [emitted] (name: main) 1 related asset
+    asset main.20e7aaf6d4066522ef6d.hot-update.js 1.75 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.20e7aaf6d4066522ef6d.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.05 MiB (2.06 MiB) = static/js/bundle.js 2.04 MiB main.20e7aaf6d4066522ef6d.hot-update.js 1.75 KiB 2 auxiliary assets
+cached modules 2.03 MiB [cached] 158 modules
+runtime modules 31.5 KiB 17 modules
+javascript modules 2.8 KiB
+  ./src/styles/main.css 2.76 KiB [code generated]
+  ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 39 bytes [built] [code generated] [1 error]
+
+ERROR in ./src/styles/main.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css)
+Module build failed (from ./node_modules/postcss-loader/dist/cjs.js):
+SyntaxError
+
+(103:5) /workspaces/SaaS_inzerce/smart-market-finder-1/frontend/src/styles/main.css Unclosed block
+
+  101 | .card-actions { margin-top: auto }
+  102 | 
+> 103 |     .card {
+      |     ^
+  104 |         transition: transform 220ms cubic-bezier(.16,.84,.24,1), box-shadow 220ms cubic-bezier(.16,.84,.24,1);
+  105 | .card-actions .button { padding:8px 12px }
+ @ ./src/styles/main.css 8:6-270 22:17-24 26:7-21 52:25-39 53:36-47 53:50-64 57:6-67:7 58:54-65 58:68-82 64:42-53 64:56-70 66:21-28 78:22-29 78:33-47 78:50-64 77:0-240 77:0-240 55:4-68:5
+ @ ./src/index.tsx 7:0-27
+
+webpack 5.101.3 compiled with 1 error in 173 ms
+No issues found.
+Compiling...
+Failed to compile.
+
+Syntax error: /workspaces/SaaS_inzerce/smart-market-finder-1/frontend/src/styles/main.css Unclosed block (103:5)
+  101 | .card-actions { margin-top: auto }
+  102 | 
+> 103 |     .card {
+      |     ^
+  104 |         transition: transform 220ms cubic-bezier(.16,.84,.24,1), box-shadow 220ms cubic-bezier(.16,.84,.24,1);
+  105 | .card-actions .button { padding:8px 12px }
+assets by status 2.1 MiB [cached] 3 assets
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.03 MiB (javascript) 31.5 KiB (runtime) [cached] 174 modules
+javascript modules 7.36 KiB
+  ./src/pages/Home.tsx 3.16 KiB [built]
+  ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 39 bytes [built] [1 error]
+  ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/tokens.css 4.17 KiB [built]
+
+ERROR in ./src/styles/main.css (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css)
+Module build failed (from ./node_modules/postcss-loader/dist/cjs.js):
+SyntaxError
+
+(103:5) /workspaces/SaaS_inzerce/smart-market-finder-1/frontend/src/styles/main.css Unclosed block
+
+  101 | .card-actions { margin-top: auto }
+  102 | 
+> 103 |     .card {
+      |     ^
+  104 |         transition: transform 220ms cubic-bezier(.16,.84,.24,1), box-shadow 220ms cubic-bezier(.16,.84,.24,1);
+  105 | .card-actions .button { padding:8px 12px }
+ @ ./src/styles/main.css 8:6-270 22:17-24 26:7-21 52:25-39 53:36-47 53:50-64 57:6-67:7 58:54-65 58:68-82 64:42-53 64:56-70 66:21-28 78:22-29 78:33-47 78:50-64 77:0-240 77:0-240 55:4-68:5
+ @ ./src/index.tsx 7:0-27
+
+webpack 5.101.3 compiled with 1 error in 190 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.11 MiB [emitted]
+  assets by chunk 2.11 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.5448cca7fd09f3fc0691.hot-update.js 33.4 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.5448cca7fd09f3fc0691.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.11 MiB (2.12 MiB) = static/js/bundle.js 2.07 MiB main.5448cca7fd09f3fc0691.hot-update.js 33.4 KiB 2 auxiliary assets
+cached modules 2.03 MiB [cached] 158 modules
+runtime modules 31.5 KiB 17 modules
+javascript modules 33.7 KiB
+  ./src/styles/main.css 2.76 KiB [code generated]
+  ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 30.9 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 308 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.08 MiB [emitted] (name: main) 1 related asset
+    asset main.277a4e37664b14915287.hot-update.js 6.29 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.277a4e37664b14915287.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.08 MiB main.277a4e37664b14915287.hot-update.js 6.29 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./src/pages/Home.tsx 3.91 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 726 ms
+ERROR in src/pages/Home.tsx:31:82
+TS2345: Argument of type 'any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type 'any[]' is not assignable to type 'never[]'.
+    Type 'any' is not assignable to type 'never'.
+    29 |                         const next = await getResults();
+    30 |                         const resArr = next.results || next || [];
+  > 31 |                         if (Array.isArray(resArr) && resArr.length) { setResults(resArr); break; }
+       |                                                                                  ^^^^^^
+    32 |                     } catch (e) { /* ignore and continue polling */ }
+    33 |                 }
+    34 |             } else {
+
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.08 MiB [emitted] (name: main) 1 related asset
+    asset main.17e39042f4c378147c4c.hot-update.js 3.44 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.17e39042f4c378147c4c.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.08 MiB main.17e39042f4c378147c4c.hot-update.js 3.44 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 158 modules
+runtime modules 31.5 KiB 17 modules
+javascript modules 5.93 KiB
+  ./src/pages/Home.tsx 3.91 KiB [code generated]
+  ./src/services/api.ts 2.03 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 1720 ms
+ERROR in src/pages/Home.tsx:31:82
+TS2345: Argument of type 'any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type 'any[]' is not assignable to type 'never[]'.
+    Type 'any' is not assignable to type 'never'.
+    29 |                         const next = await getResults();
+    30 |                         const resArr = next.results || next || [];
+  > 31 |                         if (Array.isArray(resArr) && resArr.length) { setResults(resArr); break; }
+       |                                                                                  ^^^^^^
+    32 |                     } catch (e) { /* ignore and continue polling */ }
+    33 |                 }
+    34 |             } else {
+
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.08 MiB [emitted] (name: main) 1 related asset
+    asset main.4261ba5c90638718500e.hot-update.js 6.22 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.4261ba5c90638718500e.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.08 MiB main.4261ba5c90638718500e.hot-update.js 6.22 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./src/pages/Home.tsx 3.87 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 649 ms
+ERROR in src/pages/Home.tsx:20:19
+TS2304: Cannot find name 'triggerSearch'.
+    18 |             try { const cur = await getResults(); setResults(cur.results || cur || []); } catch (e) { /* ignore */ }
+    19 |             // trigger backend search in background (short client timeout)
+  > 20 |             try { triggerSearch(payload, 2000); } catch (e) { /* ignore */ }
+       |                   ^^^^^^^^^^^^^
+    21 |
+    22 |             // Poll for up to 10s to see if stored results appeared/updated
+    23 |             const deadline = Date.now() + 10000;
+
+ERROR in src/pages/Home.tsx:29:78
+TS2345: Argument of type 'any[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type 'any[]' is not assignable to type 'never[]'.
+    Type 'any' is not assignable to type 'never'.
+    27 |                     const next = await getResults();
+    28 |                     const resArr = next.results || next || [];
+  > 29 |                     if (Array.isArray(resArr) && resArr.length) { setResults(resArr); break; }
+       |                                                                              ^^^^^^
+    30 |                 } catch (e) { /* ignore and continue polling */ }
+    31 |             }
+    32 |         } finally {
+
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.08 MiB [emitted] (name: main) 1 related asset
+    asset main.a8994ba360c677a9599f.hot-update.js 6.26 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.a8994ba360c677a9599f.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.08 MiB main.a8994ba360c677a9599f.hot-update.js 6.26 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./src/pages/Home.tsx 3.88 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 358 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.08 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.08 MiB [emitted] (name: main) 1 related asset
+    asset main.ec8c2e74cbb68abb3ff5.hot-update.js 3.48 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.ec8c2e74cbb68abb3ff5.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.09 MiB) = static/js/bundle.js 2.08 MiB main.ec8c2e74cbb68abb3ff5.hot-update.js 3.48 KiB 2 auxiliary assets
+cached modules 2.06 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./src/services/api.ts 2.07 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 390 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 2.14 MiB [cached] 3 assets
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.06 MiB (javascript) 31.5 KiB (runtime) [cached] 175 modules
+javascript modules 5.96 KiB
+  ./src/pages/Home.tsx 3.88 KiB [built]
+  ./src/services/api.ts 2.07 KiB [built]
+webpack 5.101.3 compiled successfully in 183 ms
+No issues found.
+Proxy error: Could not proxy request /api/search from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNRESET).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Proxy error: Could not proxy request /api/results from 127.0.0.1:3001 to http://localhost:3000.
+See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (ECONNREFUSED).
+
+Compiling...
+Compiled successfully!
+assets by status 2.14 MiB [cached] 3 assets
+asset asset-manifest.json 486 bytes [emitted]
+cached modules 2.07 MiB (javascript) 31.5 KiB (runtime) [cached] 177 modules
+webpack 5.101.3 compiled successfully in 216 ms
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.09 MiB [emitted]
+  assets by chunk 2.08 MiB (name: main)
+    asset static/js/bundle.js 2.07 MiB [emitted] (name: main) 1 related asset
+    asset main.76d4ade0155cd9b61ef1.hot-update.js 14.4 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 672 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.76d4ade0155cd9b61ef1.hot-update.json 61 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.08 MiB (2.1 MiB) = static/js/bundle.js 2.07 MiB main.76d4ade0155cd9b61ef1.hot-update.js 14.4 KiB 2 auxiliary assets
+cached modules 2.05 MiB [cached] 158 modules
+runtime modules 31.5 KiB 17 modules
+javascript modules 10.1 KiB
+  ./src/pages/Home.tsx 4.27 KiB [built] [code generated]
+  ./src/components/AnimatedSearch.tsx 5.85 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 1272 ms
+No issues found.
+Compiling...
+Compiled successfully!
+assets by status 62.3 KiB [cached] 2 assets
+assets by status 2.12 MiB [emitted]
+  assets by chunk 2.12 MiB (name: main)
+    asset static/js/bundle.js 2.08 MiB [emitted] (name: main) 1 related asset
+    asset main.e1e463b229d399b2639a.hot-update.js 42.1 KiB [emitted] [immutable] [hmr] (name: main) 1 related asset
+  assets by path *.json 639 bytes
+    asset asset-manifest.json 611 bytes [emitted]
+    asset main.e1e463b229d399b2639a.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 2.12 MiB (2.14 MiB) = static/js/bundle.js 2.08 MiB main.e1e463b229d399b2639a.hot-update.js 42.1 KiB 2 auxiliary assets
+cached modules 2.03 MiB [cached] 159 modules
+runtime modules 31.5 KiB 17 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/styles/main.css 39.6 KiB [built] [code generated]
+webpack 5.101.3 compiled successfully in 413 ms
+No issues found.

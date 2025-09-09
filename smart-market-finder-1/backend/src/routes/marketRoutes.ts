@@ -1,7 +1,7 @@
 import { Router, RequestHandler, Express } from 'express';
 import { z } from 'zod';
-import { search, getResults, suggestPostal } from '../controllers/marketController';
-import { createListing, listRecent } from '../controllers/listingController';
+import { search, getResults, suggestPostal, searchQuick } from '../controllers/marketController';
+import { createListing, listRecent, listFromDb, getListing } from '../controllers/listingController';
 import { validateSearch as validateSearchMiddleware } from '../middleware/validateSearch';
 import { defaultRateLimiter } from '../middleware/rateLimit';
 import { validate } from '../middleware/validateZod';
@@ -28,11 +28,17 @@ const searchSchema = z.object({
 
 // Endpoints
 router.post('/search', validate(searchSchema), search);
+// quick, non-blocking search that returns stored results immediately and triggers a background refresh
+router.post('/search-quick', validate(searchSchema), searchQuick as any);
 router.get('/suggest/postal', suggestPostal);
 router.get('/results', getResults);
 // Listing CRUD (simple)
 router.post('/listings', createListing);
 router.get('/listings', listRecent);
+// Debug: direct DB read for listings
+router.get('/listings-db', listFromDb);
+// Get single listing by url or id
+router.get('/listing', getListing);
 // Backwards-compatible named export: some older code imported `setRoutes`.
 // Provide a tiny helper so both `import marketRoutes from './routes/marketRoutes'`
 // and `import { setRoutes } from './routes/marketRoutes'` work.

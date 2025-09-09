@@ -1,6 +1,9 @@
 export type ScrapeItem = {
   title: string;
+  // numeric-only price string (digits only) — e.g. "349000"
   price: string;
+  // currency code for the price; default to 'CZK'
+  currency?: string;
   location: string;
   postal?: string;
   lat?: number;
@@ -42,7 +45,13 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
 
   const normalizeForMatch = (s?: string) => String(normalizeText(s)).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
 
-  const normalizePrice = (p: string) => normalizeText(p || '');
+  // Return numeric-only price string (digits only) extracted from input text.
+  // If no digits found, returns empty string.
+  const normalizePrice = (p: string) => {
+    const raw = normalizeText(p || '');
+    const digits = String(raw).replace(/[^0-9]/g, '');
+    return digits || '';
+  };
 
   const extractCurrencyFromText = (text?: string): string => {
     if (!text) return '';
@@ -97,8 +106,9 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const cheerio = require('cheerio');
       const $ = cheerio.load(html);
-      const base = optsParse.baseUrl || 'https://www.bazos.cz';
-      const anchors = $('h2.nadpis a, .inzeratynadpis a, .nadpis a').toArray();
+  const base = optsParse.baseUrl || 'https://www.bazos.cz';
+  // broader anchor selection to catch different page variants
+  const anchors = $('h2.nadpis a, .inzeratynadpis a, .nadpis a, a[href*="/inzerat"], a[href*="/detail"], .result a').toArray();
       const cap = Math.max(5, Math.min(50, Number(optsParse.limit || 20)));
       const found: ScrapeItem[] = [];
       for (let i = 0; i < anchors.length && found.length < cap; i++) {
@@ -135,22 +145,23 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
             if (c) priceText = c;
           }
 
-          let thumb = '';
-          let imgs: string[] = [];
+            let thumb = '';
+            let imgs: string[] = [];
           try {
-            const img = $a.find('img').first();
-            if (img && img.length) { thumb = ($(img).attr('src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} }
-            else if (container) { const img2 = container.find('img').first(); if (img2 && img2.length) { thumb = ($(img2).attr('src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} } }
-            // collect up to 4 images from the container as candidates
-            try {
-              const imgsFound = container.find('img').toArray().map((el: any) => ($(el).attr('src') || '').trim()).filter(Boolean).slice(0, 4);
-              imgs = imgsFound.map((u: string) => { try { return new URL(u, base).href; } catch { return u; } });
-            } catch (e) { /* ignore */ }
+              const img = $a.find('img').first();
+              if (img && img.length) { thumb = ($(img).attr('src') || $(img).attr('data-src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} }
+              else if (container) { const img2 = container.find('img').first(); if (img2 && img2.length) { thumb = ($(img2).attr('src') || $(img2).attr('data-src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} } }
+              // collect up to 4 images from the container as candidates
+              try {
+                const imgsFound = container.find('img').toArray().map((el: any) => ($(el).attr('src') || $(el).attr('data-src') || '').trim()).filter(Boolean).slice(0, 4);
+                imgs = imgsFound.map((u: string) => { try { return new URL(u, base).href; } catch { return u; } });
+              } catch (e) { /* ignore */ }
           } catch (e) { logger.debug('[parseListingsFromHtml] thumb parse error', e && (e as any).message ? (e as any).message : e); }
 
           const item: ScrapeItem = {
             title: normalizeText(title),
             price: normalizePrice(priceText || ''),
+            currency: normalizePrice(priceText || '') ? 'CZK' : 'CZK',
             location: normalizeText(locText || ''),
             url: href,
             date: new Date().toISOString(),
@@ -342,7 +353,7 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
       if (toFetch.length === 0) return items;
       const batchSize = Math.max(1, concurrency);
       // helper to GET with retries (simple exponential backoff)
-      const fetchWithRetries = async (url: string, attempts = 2, timeout = 8000) => {
+      const fetchWithRetries = async (url: string, attempts = 3, timeout = 10000) => {
         let lastErr: any = null;
         for (let a = 0; a < attempts; a++) {
           try {
@@ -458,4 +469,236 @@ export async function scrapeBazos(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> 
   } catch (e) { /* ignore final cleanup errors */ }
 
   return results;
+}
+
+/**
+ * Scraper for Sauto.cz — simplified and resilient parsing.
+ */
+export async function scrapeSauto(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> {
+  const DEBUG = String(process.env.DEBUG_SCRAPER || '').toLowerCase() === 'true';
+  const logger = {
+    debug: (...args: any[]) => { if (DEBUG) console.log('[scraper][sauto][debug]', ...args); },
+    info: (...args: any[]) => { if (DEBUG) console.info('[scraper][sauto][info]', ...args); },
+    error: (...args: any[]) => { console.error('[scraper][sauto][error]', ...args); }
+  };
+
+  const normalizeTextLocal = (s?: string) => { if (!s) return ''; return String(s).replace(/&nbsp;|\u00A0/g, ' ').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(); };
+
+  try {
+    // dynamic imports to keep optional deps
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const cheerio = require('cheerio');
+    const axios = (await import('axios').then(m => (m && (m as any).default) ? (m as any).default : m)).catch(() => null);
+    if (!cheerio || !axios) return [];
+
+    const { keywords = '', location } = opts;
+    const q = encodeURIComponent(String(keywords || ''));
+    let url = `https://www.sauto.cz/inzerce/osobni?q=${q}`;
+    if (location) url += `&lokalita=${encodeURIComponent(String(location))}`;
+    logger.debug('[scrapeSauto] fetching', url);
+    const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 15000 }).catch((e: any) => { logger.debug('[scrapeSauto] fetch error', e && e.message); return null; });
+    if (!res || !res.data) return [];
+    const $ = cheerio.load(String(res.data));
+
+    // Sauto listing anchors are often under .ad-card or .listing-card or article[data-ad-id]
+    const anchors = $('a[href*="/osobni/detail"], article[data-ad-id] a').toArray();
+    const found: ScrapeItem[] = [];
+    const cap = Math.max(5, Math.min(60, Number((opts as any).limit || 30)));
+    const base = 'https://www.sauto.cz';
+    for (let i = 0; i < anchors.length && found.length < cap; i++) {
+      try {
+        const a = anchors[i];
+        const $a = $(a);
+        let href = ($a.attr('href') || '').trim();
+        let title = normalizeTextLocal($a.text() || '');
+        // sometimes the anchor contains no title; try to read nearby .ad-title
+        if (!title) {
+          const parent = $a.closest('.ad-card, .listing-card, article');
+          title = normalizeTextLocal(parent.find('.ad-title, .title, h3, h2').first().text() || '');
+        }
+        if (!href) continue;
+        try { href = new URL(href, base).href; } catch {}
+        // Sauto detail links include "/osobni/detail". Ensure it.
+        if (!/\/osobni\/detail/i.test(href)) continue;
+
+        // collect basic fields
+        const parent = $a.closest('.ad-card, .listing-card, article');
+        const price = normalizeTextLocal(parent.find('.price, .ad-price, .cena').first().text() || '');
+        const loc = normalizeTextLocal(parent.find('.region, .locality, .ad-location, .ad-town').first().text() || '');
+        let thumb = '';
+        try {
+          const img = parent.find('img').first(); if (img && img.length) { thumb = (img.attr('src') || img.attr('data-src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} }
+        } catch (e) { /* ignore */ }
+
+        found.push({ title: title || `Sauto item ${i}`, price: price || '', location: loc || '', url: href, date: new Date().toISOString(), description: '', thumbnail: thumb || '', images: thumb ? [thumb] : [] });
+      } catch (e) { logger.debug('[scrapeSauto] per-anchor error', e && (e as any).message); }
+    }
+
+    // Enrich a subset of results by fetching detail pages in small batches
+    const toFetch = found.filter(f => !f.price || !f.location || !f.thumbnail).slice(0, 12);
+    const concurrency = Number(process.env.DETAIL_PAR_CONCURRENCY || '3');
+    const fetchWithRetries = async (u: string, attempts = 3) => {
+      let last: any = null;
+      for (let a = 0; a < attempts; a++) {
+        try { return await axios.get(u, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }); } catch (e) { last = e; await new Promise(r => setTimeout(r, 200 * Math.pow(2, a))); }
+      }
+      throw last;
+    };
+
+    for (let i = 0; i < toFetch.length; i += concurrency) {
+      const batch = toFetch.slice(i, i + concurrency);
+      await Promise.all(batch.map(async it => {
+        try {
+          const r = await fetchWithRetries(it.url).catch(() => null);
+          if (!r || !r.data) return;
+          const $$ = cheerio.load(String(r.data));
+          try {
+            const metaDesc = ($$('meta[property="og:description"]').attr('content') || $$('meta[name="description"]').attr('content') || '').trim();
+            if ((!it.description || it.description === '') && metaDesc) it.description = normalizeTextLocal(metaDesc);
+          } catch {}
+          try { if (!it.price) it.price = normalizeTextLocal($$('.price, .cena, [itemprop="price"]').first().text() || ''); } catch {}
+          try { if (!it.location) it.location = normalizeTextLocal($$('.region, .town, .locality, .ad-location').first().text() || ''); } catch {}
+          try { if ((!it.thumbnail || it.thumbnail === '') && $$('meta[property="og:image"]').attr('content')) { it.thumbnail = new URL($$('meta[property="og:image"]').attr('content') || '', it.url).href; } } catch {}
+          try { const imgs = $$('img').toArray().map((el: any) => ($$(el).attr('src') || $$(el).attr('data-src') || '').trim()).filter(Boolean).slice(0, 8).map((u: string) => { try { return new URL(u, it.url).href; } catch { return u; } }); if (imgs && imgs.length) it.images = imgs; } catch {}
+        } catch (e) { logger.debug('[scrapeSauto] detail fetch failed', e && (e as any).message); }
+      }));
+    }
+
+    return found;
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Scraper for Cars.cz (heuristic, resilient selectors).
+ */
+export async function scrapeCars(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> {
+  const DEBUG = String(process.env.DEBUG_SCRAPER || '').toLowerCase() === 'true';
+  const logger = {
+    debug: (...args: any[]) => { if (DEBUG) console.log('[scraper][cars][debug]', ...args); },
+    info: (...args: any[]) => { if (DEBUG) console.info('[scraper][cars][info]', ...args); },
+    error: (...args: any[]) => { console.error('[scraper][cars][error]', ...args); }
+  };
+
+  const normalizeTextLocal = (s?: string) => { if (!s) return ''; return String(s).replace(/&nbsp;|\u00A0/g, ' ').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(); };
+
+  try {
+    // dynamic imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const cheerio = require('cheerio');
+    const axios = (await import('axios').then(m => (m && (m as any).default) ? (m as any).default : m)).catch(() => null);
+    if (!cheerio || !axios) return [];
+
+    const { keywords = '', location } = opts;
+    const q = encodeURIComponent(String(keywords || ''));
+    // Cars.cz search endpoint varies; use a query param heuristic
+    let url = `https://www.cars.cz/inzerce/?search=${q}`;
+    if (location) url += `&location=${encodeURIComponent(String(location))}`;
+    logger.debug('[scrapeCars] fetching', url);
+    const res = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 15000 }).catch((e: any) => { logger.debug('[scrapeCars] fetch error', e && e.message); return null; });
+    if (!res || !res.data) return [];
+    const $ = cheerio.load(String(res.data));
+
+    // anchors: links to detail pages or article-like wrappers
+    const anchors = $('a[href*="/inzerat/"], article[data-id] a, .result a').toArray();
+    const found: ScrapeItem[] = [];
+    const cap = Math.max(5, Math.min(60, Number((opts as any).limit || 30)));
+    const base = 'https://www.cars.cz';
+    for (let i = 0; i < anchors.length && found.length < cap; i++) {
+      try {
+        const a = anchors[i];
+        const $a = $(a as any);
+        let href = ($a.attr('href') || '').trim();
+        let title = normalizeTextLocal($a.text() || '');
+        if (!href) continue;
+        try { href = new URL(href, base).href; } catch {}
+        // quick guard: ensure probable detail link
+        if (!/inzerat|detail|nabidka/i.test(href)) continue;
+
+        const parent = $a.closest('article, .result, .ad, .listing');
+        const price = normalizeTextLocal(parent.find('.price, .price--value, .cena, .ad-price').first().text() || '');
+        const loc = normalizeTextLocal(parent.find('.region, .town, .mesto, .locality').first().text() || '');
+        let thumb = '';
+        try {
+          const img = parent.find('img').first(); if (img && img.length) { thumb = (img.attr('src') || img.attr('data-src') || '').trim(); try { thumb = new URL(thumb, base).href; } catch {} }
+        } catch (e) { /* ignore */ }
+
+        found.push({ title: title || `Cars item ${i}`, price: price || '', location: loc || '', url: href, date: new Date().toISOString(), description: '', thumbnail: thumb || '', images: thumb ? [thumb] : [] });
+      } catch (e) { logger.debug('[scrapeCars] per-anchor error', e && (e as any).message); }
+    }
+
+    // enrich some results by fetching detail pages
+    const toFetch = found.filter(f => !f.price || !f.location || !f.thumbnail).slice(0, 12);
+    const concurrency = Number(process.env.DETAIL_PAR_CONCURRENCY || '3');
+    const fetchWithRetries = async (u: string, attempts = 3) => {
+      let last: any = null;
+      for (let a = 0; a < attempts; a++) {
+        try { return await axios.get(u, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout: 10000 }); } catch (e) { last = e; await new Promise(r => setTimeout(r, 200 * Math.pow(2, a))); }
+      }
+      throw last;
+    };
+
+    for (let i = 0; i < toFetch.length; i += concurrency) {
+      const batch = toFetch.slice(i, i + concurrency);
+      await Promise.all(batch.map(async it => {
+        try {
+          const r = await fetchWithRetries(it.url).catch(() => null);
+          if (!r || !r.data) return;
+          const $$ = cheerio.load(String(r.data));
+          try { if ((!it.description || it.description === '') && $$('meta[property="og:description"]').attr('content')) it.description = normalizeTextLocal($$('meta[property="og:description"]').attr('content') || ''); } catch {}
+          try { if (!it.price) it.price = normalizeTextLocal($$('.price, .cena, [itemprop="price"]').first().text() || ''); } catch {}
+          try { if (!it.location) it.location = normalizeTextLocal($$('.region, .town, .locality').first().text() || ''); } catch {}
+          try { if ((!it.thumbnail || it.thumbnail === '') && $$('meta[property="og:image"]').attr('content')) { it.thumbnail = new URL($$('meta[property="og:image"]').attr('content') || '', it.url).href; } } catch {}
+          try { const imgs = $$('img').toArray().map((el: any) => ($$(el).attr('src') || $$(el).attr('data-src') || '').trim()).filter(Boolean).slice(0, 8).map((u: string) => { try { return new URL(u, it.url).href; } catch { return u; } }); if (imgs && imgs.length) it.images = imgs; } catch {}
+        } catch (e) { logger.debug('[scrapeCars] detail fetch failed', e && (e as any).message); }
+      }));
+    }
+
+    return found;
+  } catch (e) {
+    return [];
+  }
+}
+
+// Generic fetch with retries usable outside the module
+export const fetchWithRetriesGeneric = async (axiosImpl: any, url: string, attempts = 3, timeout = 10000) => {
+  let lastErr: any = null;
+  for (let a = 0; a < attempts; a++) {
+    try {
+      return await axiosImpl.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SmartMarketFinder/1.0)' }, timeout });
+    } catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 200 * Math.pow(2, a))); }
+  }
+  throw lastErr;
+};
+
+// Top-level scraper wrapper that can aggregate results from multiple portal-specific scrapers.
+// Currently it calls `scrapeBazos` but is implemented so additional scrapers can be added in parallel.
+export async function scrape(opts: ScrapeOpts = {}): Promise<ScrapeItem[]> {
+  try {
+    const runners: Promise<ScrapeItem[]>[] = [];
+    // primary: Bazoš
+    runners.push(scrapeBazos(opts));
+  // add Sauto scraper (runs in parallel)
+  try { runners.push(scrapeSauto(opts)); } catch (e) { /* ignore if not available */ }
+  // try to add Cars.cz scraper
+  try { runners.push(scrapeCars(opts)); } catch (e) { /* ignore */ }
+
+    const settled = await Promise.allSettled(runners);
+    const all: ScrapeItem[] = [];
+    for (const s of settled) {
+      if (s.status === 'fulfilled' && Array.isArray(s.value)) all.push(...s.value);
+    }
+    // dedupe by normalized URL/title
+    const seen = new Map<string, ScrapeItem>();
+    for (const it of all) {
+      const urlKey = (it.url || '').split(/[?#]/)[0].trim();
+      const titleKey = (it.title || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      const key = urlKey || (titleKey ? `t:${titleKey}` : `f:${seen.size}`);
+      if (!seen.has(key)) seen.set(key, it);
+    }
+    return Array.from(seen.values()).slice(0, Math.max(0, Number(opts.limit || 100)));
+  } catch (e) {
+    return [];
+  }
 }
