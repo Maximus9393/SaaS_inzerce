@@ -33,17 +33,7 @@ const Home: React.FC = () => {
         }
     };
 
-    // load last results on mount
-    React.useEffect(() => {
-        (async () => {
-            try {
-                const data = await getResults();
-                setResults(data.results || data);
-            } catch (e) {
-                // ignore
-            }
-        })();
-    }, []);
+    // do not load results on mount; results should appear only after an explicit search
 
     const loadMore = () => setVisibleCount(c => c + itemsPerPage);
 

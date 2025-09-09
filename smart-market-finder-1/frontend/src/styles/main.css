@@ -236,8 +236,9 @@ main { padding-top:84px }
 .animated-search form { display: block; padding: 0; margin: 0; }
 .animated-search input { white-space: pre; font-size: 16px; font-family: inherit; padding: 8px 16px 8px 12px; display: block; line-height: 22px; font-weight: 500; color: var(--primary-600); caret-color: var(--primary-600); border: 0; background: 0; outline: none; transition: color .1s ease; width: 32px; }
 .animated-search .close { border-radius: 50%; position: absolute; right: 16px; width: 24px; height: 24px; background: #E4ECFA; top: 19px; cursor: pointer; opacity: 0; visibility: hidden; transform: translate(-8px, 0); transition: transform .3s ease 0s, opacity .3s ease 0s, visibility .3s ease 0s; }
-.animated-search .results-panel { overflow: hidden; margin: 0; padding: 8px 0 24px 0; list-style: none; position: absolute; left: 16px; top: 62px; white-space: nowrap; width: calc(100% - 32px); }
+.animated-search .results-panel { overflow: hidden; margin: 0; padding: 8px 0 24px 0; list-style: none; position: absolute; left: 16px; top: 62px; white-space: nowrap; width: calc(100% - 32px); max-height: 0; opacity: 0; visibility: hidden; transition: max-height .4s ease, opacity .3s ease, visibility .3s ease; }
 .animated-search .results-panel .card { opacity: 0; transform: translateY(-6px); transition: all .3s ease; }
+.animated-search.done .results-panel { max-height: 1600px; opacity: 1; visibility: visible; }
 .animated-search.done .close { opacity: 1; visibility: visible; transform: translate(0,0); }
 .animated-search.done input { color: #fff; }
 .animated-search.submit { background: var(--primary); transform: scale(.92); }
