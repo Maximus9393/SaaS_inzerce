@@ -6,7 +6,8 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background: linear-gradient(180deg, #f3f7ff 0%, var(--bg) 100%);
+    /* Solid, uniform page background using design token */
+    background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
 }
@@ -24,7 +25,8 @@ h1, h2, h3 {
 .hero-search {
     margin-top: 8px; /* slight spacing under fixed header */
     width: 100%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,252,0.95));
+    /* use surface token for hero card background so page background stays uniform */
+    background: var(--surface);
     border-radius: 18px;
     padding: 18px 22px;
     box-shadow: 0 12px 30px rgba(10,79,176,0.06), inset 0 1px 0 rgba(255,255,255,0.6);
@@ -175,7 +177,7 @@ h1, h2, h3 {
 .no-results { padding:18px; background:linear-gradient(180deg,#fff,#fbfdff); border-radius:20px; box-shadow:var(--shadow-sm); }
 .example-card { display:flex; gap:12px; align-items:flex-start; padding:14px }
 
-.site-header { position:fixed; top:0; left:0; right:0; height:72px; background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(250,250,252,0.95)); box-shadow: 0 6px 20px rgba(11,43,76,0.06); display:flex; align-items:center; z-index:900 }
+.site-header { position:fixed; top:0; left:0; right:0; height:72px; background: var(--bg); box-shadow: 0 6px 20px rgba(11,43,76,0.06); display:flex; align-items:center; z-index:900 }
 .site-header .brand-title { font-family: var(--font-sans); }
 .site-nav { display:flex; align-items:center; gap:8px }
 .site-nav a { margin-left:0; color:var(--muted); text-decoration:none; padding:8px 12px; border-radius:999px; background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4)); box-shadow: none; font-weight:600 }
