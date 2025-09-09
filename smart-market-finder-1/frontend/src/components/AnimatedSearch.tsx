@@ -179,7 +179,22 @@ export default function AnimatedSearch(props: Props) {
           placeholder="Hledat (např. Octavia, BMW)"
         />
         {/* hidden span used for precise measurement (moved offscreen to reliably measure width) */}
-        <span aria-hidden ref={spanRef} style={{ position: 'absolute', left: -9999, top: -9999, visibility: 'hidden', display: 'inline-block', whiteSpace: 'pre' }} />
+        <span
+          aria-hidden
+          ref={spanRef}
+          style={{
+            position: 'absolute',
+            left: -9999,
+            top: -9999,
+            visibility: 'hidden',
+            display: 'inline-block',
+            whiteSpace: 'pre',
+            // ensure measurements match the input font/weight
+            font: 'inherit',
+            fontSize: '16px',
+            fontWeight: 500,
+          }}
+        />
         {/* inline spinner while loading */}
         {loading ? <div className="inline-spinner" aria-hidden /> : null}
       </form>

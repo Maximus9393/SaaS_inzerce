@@ -333,17 +333,18 @@ main { padding-top:84px }
 /* Animated search widget styles (converted from example) */
 /* Consolidated animated-search/search styles: unified, accessible, reduced-motion friendly */
 .animated-search, .search {
-        --search-primary: var(--primary);
-        --search-primaryLight: var(--primary-600);
-        background: var(--surface);
-        padding: 12px 16px 12px 48px;
-        position: relative;
-        display: table;
-        margin: auto;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px -6px rgba(18,22,33, .12);
-        transition: background var(--trans-fast), transform var(--trans-fast), padding var(--trans-medium);
-        width: 520px; max-width: 92%; overflow: visible;
+    --search-primary: var(--primary);
+    --search-primaryLight: var(--primary-600);
+    /* use the elevated bg token so the search visually matches cards/hero */
+    background: var(--bg-elevated);
+    padding: 12px 16px 12px 48px;
+    position: relative;
+    display: table;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px -6px rgba(18,22,33, .12);
+    transition: background var(--trans-fast), transform var(--trans-fast), padding var(--trans-medium);
+    width: 520px; max-width: 92%; overflow: visible;
 }
 .animated-search .bar, .search .bar { position: absolute; left: 16px; top: 15px; width: 32px; height: 32px; overflow: hidden; }
 .animated-search .bar span, .search .bar span { display:block; color:#fff; position:absolute; left:12px; top:0; line-height:32px; font-weight:500; font-size:16px; opacity:0; right:16px; overflow:hidden; white-space:nowrap }
@@ -352,7 +353,26 @@ main { padding-top:84px }
 .animated-search .bar .icon:before, .animated-search .bar .icon:after, .search .bar .icon:before, .search .bar .icon:after { content:''; display:block; position:absolute; backface-visibility:hidden; border-radius:50% }
 .animated-search .bar .icon:before, .search .bar .icon:before { background:#fff; left:4px; top:4px; right:4px; bottom:4px; z-index:2 }
 .animated-search form, .search form { display:block; padding:0; margin:0 }
-.animated-search input, .search input { white-space:pre; font-size:16px; font-family:inherit; padding:8px 16px 8px 12px; display:inline-block; line-height:22px; font-weight:500; color:var(--search-primaryLight); caret-color:var(--search-primaryLight); border:0; background:transparent; outline:none; transition: color .12s ease, width .18s ease; width:auto }
+.animated-search input, .search input {
+    white-space: pre;
+    font-size: 16px;
+    font-family: inherit;
+    padding: 8px 16px 8px 12px;
+    display: inline-block;
+    line-height: 22px;
+    font-weight: 500;
+    color: var(--search-primaryLight);
+    caret-color: var(--search-primaryLight);
+    border: 0;
+    background: transparent;
+    outline: none;
+    transition: color .12s ease, width .18s ease;
+    width: auto;
+    /* prevent clipping: allow the input to grow but cap it and allow horizontal scroll */
+    max-width: calc(100% - 140px);
+    min-width: 40px;
+    overflow-x: auto;
+}
 .animated-search .close, .search .close { border-radius:50%; position:absolute; right:16px; width:24px; height:24px; background:#E4ECFA; top:19px; cursor:pointer; opacity:0; visibility:hidden; transform:translate(-8px,0); transition: transform .3s ease, opacity .3s ease, visibility .3s ease }
 .animated-search .results-panel, .search .results-panel { overflow:hidden; margin:0; padding:8px 0 24px 0; list-style:none; position:absolute; left:16px; top:62px; right:16px; width:auto; max-height:0; opacity:0; visibility:hidden; transition: max-height .4s ease, opacity .3s ease, visibility .3s ease }
 .animated-search .results-panel .card, .search .results-panel .card { opacity:0; transform:translateY(-6px); transition: all .3s ease }
