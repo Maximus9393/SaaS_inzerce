@@ -10,3 +10,6 @@ smart-market-finder-1/backend/dist/
 smart-market-finder-1/backend/dist/**
 smart-market-finder-1/backend/backend_run.log
 smart-market-finder-1/backend/backend.run.log
+
+# Ignore ad-hoc temp artifacts at repo root
+tmp_*
