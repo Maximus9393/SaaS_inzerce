@@ -191,6 +191,14 @@ h1, h2, h3 {
 /* inline spinner inside the animated search */
 .inline-spinner { width:18px; height:18px; border-radius:50%; border:2px solid rgba(255,255,255,0.4); border-top-color: rgba(255,255,255,0.9); margin-left:8px; animation: spin 0.9s linear infinite; display:inline-block }
 
+/* screen-reader only */
+.sr-only { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+
+/* tweak fonts and smoothing for pixel-perfect look */
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+.site-header .brand-title { font-weight: 600; letter-spacing: -0.01em }
+.site-nav a span { display: inline-block }
+
 /* Header polish */
 .site-header-inner { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .brand { display:flex; align-items:center; gap:12px }

@@ -9,8 +9,10 @@ const Home: React.FC = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const [loading, setLoading] = useState(false);
+    const [announce, setAnnounce] = useState('');
     const handleSearch = async (searchCriteria: any) => {
         setLoading(true);
+    setAnnounce('Vyhledávání spuštěno');
         try {
             const payload = Object.assign({ limit: itemsPerPage }, searchCriteria);
             // show currently stored results immediately
@@ -28,6 +30,7 @@ const Home: React.FC = () => {
                     if (Array.isArray(resArr) && resArr.length) { setResults(resArr); break; }
                 } catch (e) { /* ignore and continue polling */ }
             }
+            setAnnounce('Vyhledávání dokončeno');
         } finally {
             setLoading(false);
         }
@@ -50,6 +53,7 @@ const Home: React.FC = () => {
                     {results && results.length ? <ResultsList results={results} loading={loading} /> : null}
                 </AnimatedSearch>
             </div>
+            <div aria-live="polite" aria-atomic="true" className="sr-only">{announce}</div>
         </div>
     );
 };
