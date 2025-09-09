@@ -3,9 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 type Props = {
   onSearch: (params: { keywords?: string; location?: string }) => void;
   children?: React.ReactNode;
+  loading?: boolean;
+  autofocus?: boolean;
 };
 
-export default function AnimatedSearch({ onSearch, children }: Props) {
+export default function AnimatedSearch(props: Props) {
+  const { onSearch, children, loading = false, autofocus = false } = props;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -30,6 +33,21 @@ export default function AnimatedSearch({ onSearch, children }: Props) {
   }
 
   useEffect(() => { resizeForText(keywords); }, [keywords]);
+
+  // autofocus and shortcut: focus input on mount or when user presses '/'
+  useEffect(() => {
+    if (autofocus && inputRef.current) inputRef.current.focus();
+    function onKey(e: KeyboardEvent) {
+      // ignore if typing in inputs or modifiers used
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [autofocus]);
 
   useEffect(() => {
     return () => { /* cleanup timeouts by resetting class */ setCls(''); };
@@ -86,13 +104,16 @@ export default function AnimatedSearch({ onSearch, children }: Props) {
   }
 
   return (
-    <div className={`animated-search ${cls}`} ref={rootRef} style={{ width: 92 }}>
+  <div className={`animated-search ${cls}`} ref={rootRef} style={{ width: 92 }}>
       <div className="bar" ref={barRef}>
         <div className="icon"><i /></div>
       </div>
       <form onSubmit={submit}>
         <input ref={inputRef} type="text" value={keywords} onChange={e => setKeywords(e.target.value)} placeholder="Hledat (např. Octavia, BMW)" />
-        <span ref={spanRef} style={{ display: 'none', whiteSpace: 'pre' }} />
+    {/* hidden span used for precise measurement */}
+    <span aria-hidden ref={spanRef} style={{ position: 'absolute', visibility: 'hidden', height: 0, overflow: 'hidden', whiteSpace: 'pre' }} />
+    {/* inline spinner while loading */}
+    {loading ? <div className="inline-spinner" aria-hidden /> : null}
       </form>
       <div className="close" onClick={reset} role="button" aria-label="Close" />
       <div className="results-panel" ref={listRef}>

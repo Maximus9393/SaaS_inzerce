@@ -18,9 +18,9 @@ const Header: React.FC = () => {
           </div>
         </div>
         <nav className="site-nav" aria-label="Hlavní navigace">
-          <Link to="/">Domů</Link>
-          <Link to="/about">O projektu</Link>
-          <Link to="/contact">Kontakt</Link>
+          <Link to="/" aria-current="page"><span className="nav-icon">🏠</span> Domů <span className="nav-underline" /></Link>
+          <Link to="/about"><span className="nav-icon">ℹ️</span> O projektu <span className="nav-underline" /></Link>
+          <Link to="/contact"><span className="nav-icon">✉️</span> Kontakt <span className="nav-underline" /></Link>
         </nav>
       </div>
     </header>

@@ -45,9 +45,9 @@ const Home: React.FC = () => {
     return (
         <div className="container minimal-center">
             <h1 style={{ margin: '8px 0 6px 0' }}>Vyhledávání</h1>
-            <div className="search-wrap hero-search" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                <AnimatedSearch onSearch={handleSearch}>
-                    <ResultsList results={results} loading={loading} />
+            <div className="search-wrap hero-search hero-center" style={{ width: '100%' }}>
+                <AnimatedSearch onSearch={handleSearch} loading={loading} autofocus>
+                    {results && results.length ? <ResultsList results={results} loading={loading} /> : null}
                 </AnimatedSearch>
             </div>
         </div>
