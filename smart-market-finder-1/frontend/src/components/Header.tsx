@@ -1,14 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Header: React.FC = () => {
+function Header() {
   const [dark, setDark] = React.useState<boolean>(false);
+  const headerRef = React.useRef<HTMLElement | null>(null);
+
   React.useEffect(() => {
     document.documentElement.classList.toggle('theme-dark', dark);
   }, [dark]);
 
+  React.useEffect(() => {
+    // Toggle `.scrolled` on the header when user scrolls past a small threshold.
+    let ticking = false;
+    const onScroll = () => {
+      if (!headerRef.current) return;
+      const isScrolled = window.scrollY > 12;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (isScrolled) headerRef.current!.classList.add('scrolled');
+          else headerRef.current!.classList.remove('scrolled');
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // trigger initial check
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="site-header" role="banner">
+    <header ref={headerRef} className="site-header" role="banner">
       <div className="site-header-inner container">
         <div className="brand">
           <Link to="/" aria-label="Domů" className="logo">🚗</Link>
