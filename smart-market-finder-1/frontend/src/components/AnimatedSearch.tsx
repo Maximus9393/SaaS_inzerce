@@ -19,8 +19,13 @@ export default function AnimatedSearch({ onSearch, children }: Props) {
   // helper to update the input width based on span measurement
   function resizeForText(text?: string) {
     if (!spanRef.current || !inputRef.current) return;
+    const parentWidth = rootRef.current?.parentElement?.clientWidth || window.innerWidth;
     spanRef.current.textContent = (text === undefined || text === '') ? ' ' : text;
-    const w = Math.ceil(spanRef.current.offsetWidth) + 8;
+    const measured = Math.ceil(spanRef.current.offsetWidth) + 16; // add small padding
+    const minW = 40; // very small collapsed state
+    // make the input readable while not exceeding available space
+    const maxW = Math.max(240, Math.min(parentWidth - 120, 900));
+    const w = Math.min(Math.max(measured, minW), maxW);
     inputRef.current.style.width = w + 'px';
   }
 
@@ -42,8 +47,13 @@ export default function AnimatedSearch({ onSearch, children }: Props) {
       setCls(c => (c + ' animate').trim());
       // expand the bar width (approx animation)
       if (barRef.current && rootRef.current) {
-        const searchW = Math.max((listRef.current ? listRef.current.scrollWidth + 32 : 320), 72 + barRef.current.offsetWidth);
-        barRef.current.style.width = Math.min(searchW, rootRef.current.parentElement ? rootRef.current.parentElement.clientWidth - 48 : searchW) + 'px';
+        const parentWidth = rootRef.current.parentElement ? rootRef.current.parentElement.clientWidth : window.innerWidth;
+        // desired width based on results list or a sensible base
+        const desired = Math.max((listRef.current ? listRef.current.scrollWidth + 32 : 320), 240);
+        // cap expansion to available space with an upper bound
+        const maxBar = Math.max(320, Math.min(parentWidth - 96, 900));
+        const finalW = Math.min(desired, maxBar);
+        barRef.current.style.width = finalW + 'px';
       }
 
       // after bar animation, expand container height to reveal results
