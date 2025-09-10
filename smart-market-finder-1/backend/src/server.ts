@@ -3,6 +3,13 @@ import marketRoutes from './routes/marketRoutes';
 import { logger } from './utils/logger';
 import path from 'path';
 import { errorHandler } from './middleware/errorHandler';
+// optional security middlewares
+let helmet: any = null;
+let cors: any = null;
+let pinoHttp: any = null;
+try { helmet = require('helmet'); } catch (e) { helmet = null; }
+try { cors = require('cors'); } catch (e) { cors = null; }
+try { pinoHttp = require('pino-http'); } catch (e) { pinoHttp = null; }
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -16,6 +23,19 @@ try {
 // parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// security headers and CORS
+if (helmet) {
+  try { app.use(helmet()); } catch (e) { logger.warn('helmet init failed'); }
+}
+if (cors) {
+  try { app.use(cors()); } catch (e) { logger.warn('cors init failed'); }
+}
+
+// pino http logger (optional)
+if (pinoHttp) {
+  try { app.use(pinoHttp({ logger: require('pino')({ level: process.env.LOG_LEVEL || 'info' }) })); } catch (e) { logger.warn('pino-http init failed'); }
+}
 
 // paths to built frontend (used by root handler)
 // __dirname is backend/dist when compiled; go up two levels to reach smart-market-finder-1
