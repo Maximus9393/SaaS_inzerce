@@ -20,10 +20,16 @@
   },
   "scripts": {
   "test:integration": "./scripts/test-integration.sh",
-  "dev:backend": "ts-node-dev --respawn --transpile-only smart-market-finder-1/backend/src/server.ts",
-  "frontend": "cd smart-market-finder-1/frontend && npm start",
+  "dev:backend": "npm --prefix smart-market-finder-1/backend run dev",
+  "start:backend": "npm --prefix smart-market-finder-1/backend run start",
+  "frontend": "npm --prefix smart-market-finder-1/frontend start",
   "dev": "node scripts/run-dev.js",
-  "start:all": "concurrently -k \"npm run dev:backend\" \"npm run frontend\"",
+  "install:all": "npm ci && (cd smart-market-finder-1/backend && npm ci) && (cd smart-market-finder-1/frontend && npm ci)",
+  "build:all": "(cd smart-market-finder-1/backend && npm run build) && (cd smart-market-finder-1/frontend && npm run build)",
+  "test:all": "(cd smart-market-finder-1/backend && npm test) && (cd smart-market-finder-1/frontend && npm test)",
+  "bootstrap": "npm run install:all && npm run build:all",
+  "dev:all": "concurrently -k \"npm run dev:backend\" \"npm run frontend\"",
+  "start:all": "concurrently -k \"npm run start:backend\" \"npm run frontend\"",
     "test": "jest --runInBand"
   }
 }
