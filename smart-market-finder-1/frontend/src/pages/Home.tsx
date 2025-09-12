@@ -201,27 +201,25 @@ const Home: React.FC = () => {
     }, [setPageHero, setThemeDark]);
 
     return (
-        <div className="container minimal-center">
-            <h1 className="hero-title">Vyhledávání</h1>
-            <div className="search-wrap hero-search hero-center full-width">
-                <AnimatedSearch onSearch={handleSearch} loading={loading} autofocus>
-                    {/* normalize fields to match ResultsList Item type */}
-                    <ResultsList
-                        results={visibleResults}
-                        loading={loading || loadingMore}
-                    />
-                    {(!loading && !loadingMore && noResults) && (
-                        <div role="status" className="no-results" style={{ marginTop: 12 }}>
-                            Žádné výsledky nenalezeny.
-                        </div>
-                    )}
-                    {(results.length > visibleCount) && (
-                        <div className="loadmore">
-                            <button className="button" onClick={loadMore} disabled={loadingMore}>{loadingMore ? 'Načítám…' : 'Načíst více'}</button>
-                        </div>
-                    )}
-                </AnimatedSearch>
-            </div>
+        // single-search landing: minimal container to center the animated search bar
+        <div className="single-search-landing">
+            <AnimatedSearch onSearch={handleSearch} loading={loading} autofocus>
+                {/* normalize fields to match ResultsList Item type */}
+                <ResultsList
+                    results={visibleResults}
+                    loading={loading || loadingMore}
+                />
+                {(!loading && !loadingMore && noResults) && (
+                    <div role="status" className="no-results" style={{ marginTop: 12 }}>
+                        Žádné výsledky nenalezeny.
+                    </div>
+                )}
+                {(results.length > visibleCount) && (
+                    <div className="loadmore">
+                        <button className="button" onClick={loadMore} disabled={loadingMore}>{loadingMore ? 'Načítám…' : 'Načíst více'}</button>
+                    </div>
+                )}
+            </AnimatedSearch>
             <div role="status" aria-atomic="true" className="sr-only">{announce}</div>
         </div>
     );
