@@ -12,7 +12,7 @@ try { cors = require('cors'); } catch (e) { cors = null; }
 try { pinoHttp = require('pino-http'); } catch (e) { pinoHttp = null; }
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3001;
 
 // Honor TRUST_PROXY env var to configure express 'trust proxy' when running behind proxies
 try {

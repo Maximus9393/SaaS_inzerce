@@ -2,7 +2,7 @@
   "name": "smart-market-finder",
   "version": "1.0.0",
   "private": true,
-  "proxy": "http://localhost:3000",
+  "proxy": "http://localhost:3001",
   "scripts": {
     "dev": "react-scripts start",
     "start": "react-scripts start",
