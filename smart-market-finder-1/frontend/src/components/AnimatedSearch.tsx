@@ -34,13 +34,6 @@ export default function AnimatedSearch(props: Props) {
     const maxW = Math.max(240, Math.min(parentWidth - 120, 900));
     const w = Math.min(Math.max(measured, minW), maxW);
     inputRef.current.style.width = w + 'px';
-    // also expand the outer bar so the input stays visible as it grows
-    if (barRef.current) {
-      const barMax = Math.min(parentWidth - 64, Math.max(320, w + 120));
-      barRef.current.style.width = Math.min(barMax, maxW + 120) + 'px';
-    }
-    // ensure caret is visible by scrolling input to end
-    try { inputRef.current.scrollLeft = inputRef.current.scrollWidth; } catch (e) { /* ignore */ }
   }
 
   useEffect(() => { resizeForText(keywords); }, [keywords]);
@@ -126,9 +119,18 @@ export default function AnimatedSearch(props: Props) {
 
   // expand immediately on focus/click without the full timed sequence
   function expandImmediate() {
-  if (!rootRef.current || !inputRef.current) return;
-  // do NOT expand the whole widget on focus; only resize the input to show text
-  resizeForText(inputRef.current.value || '');
+    if (!rootRef.current || !barRef.current) return;
+    setExpanded(true);
+    // set bar width to fit results or a sensible default
+    const parentWidth = rootRef.current.parentElement ? rootRef.current.parentElement.clientWidth : window.innerWidth;
+    const desired = Math.max((listRef.current ? listRef.current.scrollWidth + 32 : 320), 240);
+    const maxBar = Math.max(320, Math.min(parentWidth - 96, 900));
+    const finalW = Math.min(desired, maxBar);
+    barRef.current.style.width = finalW + 'px';
+    // expand container height to show results if any
+    if (listRef.current) {
+      rootRef.current.style.height = (rootRef.current.offsetHeight + listRef.current.offsetHeight) + 'px';
+    }
   }
 
   function reset() {
@@ -161,7 +163,7 @@ export default function AnimatedSearch(props: Props) {
   return (
     <div className={`animated-search ${className}`} ref={rootRef} role="search" aria-expanded={expanded}>
       <div className="bar" ref={barRef}>
-        <div className="icon"><i /></div>
+        <div className="icon" aria-hidden="true"><i /></div>
       </div>
       <form onSubmit={submit}>
         <input
@@ -173,25 +175,6 @@ export default function AnimatedSearch(props: Props) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') submit();
             if (e.key === 'Escape') reset();
-          }}
-          onKeyPress={(e) => {
-            // update measurement immediately to expand UI before React updates state
-            try {
-              if (spanRef.current && inputRef.current) {
-                const next = (inputRef.current.value || '') + e.key;
-                spanRef.current.textContent = next || ' ';
-                resizeForText(next);
-              }
-            } catch (err) { /* ignore */ }
-          }}
-          onPaste={(e) => {
-            // handle paste synchronously to measure pasted content
-            try {
-              const paste = (e.clipboardData && e.clipboardData.getData) ? e.clipboardData.getData('text') : '';
-              const next = (inputRef.current?.value || '') + paste;
-              if (spanRef.current) spanRef.current.textContent = next || ' ';
-              resizeForText(next);
-            } catch (err) { /* ignore */ }
           }}
           placeholder="Hledat (např. Octavia, BMW)"
         />

@@ -182,36 +182,6 @@ body {
     padding-right: 28px;
 }
 
-/* Single search landing: make the page a centered search bar that expands to show inline results */
-.single-search-landing {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    box-sizing: border-box;
-    /* unify background across the entire page to avoid two-tone look */
-    background: var(--bg);
-    background-image: none;
-}
-
-/* ensure animated-search sits centered and doesn't exceed viewport */
-
-.animated-search {
-    width: 100%;
-    max-width: 980px;
-    margin: 0 auto;
-    transition: all 200ms ease;
-    background: transparent; /* let the page background show through */
-}
-
-/* when collapsed show compact centered bar look */
-.animated-search .bar { width: 100%; max-width: 680px; margin: 0 auto; position:relative; }
-.animated-search form input { width: auto; max-width: 100%; box-sizing: border-box; transition: width 180ms ease; background: transparent; color: inherit; }
-
-/* ensure text measurement span uses same font styles */
-.animated-search span[aria-hidden] { font: inherit; font-size: 16px; font-weight:500; }
-
 /* utility: full width helper to replace inline styles */
 .full-width { width: 100%; }
 
@@ -367,42 +337,41 @@ main { padding-top:84px }
     --search-primaryLight: var(--primary-600);
     /* use the elevated bg token so the search visually matches cards/hero */
     background: var(--bg-elevated);
-    padding: 12px 16px 12px 48px;
+    /* tighten padding so icon sits closer to input */
+    padding: 10px 14px 10px 44px;
     position: relative;
     display: table;
     margin: auto;
     border-radius: 10px;
-    box-shadow: 0 10px 30px -6px rgba(18,22,33, .12);
+    box-shadow: 0 8px 22px -6px rgba(18,22,33, .10);
     transition: background var(--trans-fast), transform var(--trans-fast), padding var(--trans-medium);
     width: 520px; max-width: 92%; overflow: visible;
 }
 .animated-search .bar, .search .bar { position: absolute; left: 16px; top: 15px; width: 32px; height: 32px; overflow: hidden; }
-.animated-search .bar, .search .bar { pointer-events: none; }
 .animated-search .bar span, .search .bar span { display:block; color:#fff; position:absolute; left:12px; top:0; line-height:32px; font-weight:500; font-size:16px; opacity:0; right:16px; overflow:hidden; white-space:nowrap }
 .animated-search .bar:before, .search .bar:before { content:''; position:absolute; left:0; top:0; bottom:0; right:16px; border-radius:16px 0 0 16px; background:var(--search-primary); opacity:0 }
-.animated-search .bar .icon, .search .bar .icon { flex:0 0 32px; width:32px; height:32px; background:var(--search-primary); border-radius:50%; position:absolute; z-index:1; top:0; right:0; transform-style:preserve-3d; transform-origin:0 0; transform:scale(.8); transition:transform .4s ease, background .1s ease }
+.animated-search .bar .icon, .search .bar .icon { flex:0 0 28px; width:28px; height:28px; background:var(--search-primary); border-radius:50%; position:absolute; z-index:1; top:2px; right:6px; transform-style:preserve-3d; transform-origin:0 0; transform:scale(.86); transition:transform .28s ease, background .12s ease }
 .animated-search .bar .icon:before, .animated-search .bar .icon:after, .search .bar .icon:before, .search .bar .icon:after { content:''; display:block; position:absolute; backface-visibility:hidden; border-radius:50% }
 .animated-search .bar .icon:before, .search .bar .icon:before { background:#fff; left:4px; top:4px; right:4px; bottom:4px; z-index:2 }
 .animated-search form, .search form { display:block; padding:0; margin:0 }
-.animated-search form, .search form { position: relative; z-index: 2; }
 .animated-search input, .search input {
     white-space: pre;
     font-size: 16px;
     font-family: inherit;
-    padding: 8px 16px 8px 12px;
+    padding: 8px 12px 8px 8px;
     display: inline-block;
     line-height: 22px;
     font-weight: 500;
-    color: var(--search-primaryLight);
+    color: var(--text);
     caret-color: var(--search-primaryLight);
     border: 0;
     background: transparent;
     outline: none;
-    transition: color .12s ease, width .18s ease;
+    transition: color .12s ease, width .18s ease, box-shadow .12s ease;
     width: auto;
     /* prevent clipping: allow the input to grow but cap it and allow horizontal scroll */
-    max-width: calc(100% - 140px);
-    min-width: 40px;
+    max-width: calc(100% - 120px);
+    min-width: 48px;
     overflow-x: auto;
 }
 .animated-search .close, .search .close { border-radius:50%; position:absolute; right:16px; width:24px; height:24px; background:#E4ECFA; top:19px; cursor:pointer; opacity:0; visibility:hidden; transform:translate(-8px,0); transition: transform .3s ease, opacity .3s ease, visibility .3s ease }
@@ -422,7 +391,10 @@ main { padding-top:84px }
 .animated-search .results-panel .card .price-badge, .search .results-panel .card .price-badge { min-width:110px; font-size:1rem; padding:8px 12px }
 
 /* Accessibility: focus visible for interactive elements inside search */
-.animated-search input:focus-visible, .search input:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(10,79,176,0.12) }
+.animated-search input:focus-visible, .search input:focus-visible { outline: none; box-shadow: 0 0 0 6px rgba(10,79,176,0.12) }
+
+/* improve placeholder contrast for readability */
+.animated-search input::placeholder, .search input::placeholder { color: rgba(11,43,76,0.36) }
 
 /* Respect user's reduced motion preference: simplify animations */
 @media (prefers-reduced-motion: reduce) {
@@ -521,43 +493,6 @@ main { padding-top:84px }
 .animated-search .close, .search .close {
     border-radius: 50%; position: absolute; right: 16px; width: 24px; height: 24px; background: #E4ECFA; top: 19px; cursor: pointer; opacity: 0; visibility: hidden; transform: translate(-8px, 0); transition: transform .3s ease 0s, opacity .3s ease 0s, visibility .3s ease 0s;
 }
-
-/* --- Desktop polish --- */
-.animated-search {
-    border-radius: 14px;
-    padding: 14px 18px 14px 56px;
-    box-shadow: 0 14px 40px -12px rgba(11,43,76,0.15);
-}
-.animated-search .bar .icon { box-shadow: 0 6px 16px rgba(11,43,76,0.08); }
-.animated-search input { font-size: 16px; letter-spacing: -0.01em; }
-.animated-search .bar .icon { transition: transform .36s cubic-bezier(.2,.9,.2,1), box-shadow .2s ease; }
-.animated-search:focus-within { box-shadow: 0 18px 60px -18px rgba(11,43,76,0.18); transform: translateY(-2px); }
-.animated-search .bar .icon:hover { transform: scale(.92) rotate(-6deg); }
-
-/* results reveal: make cards pop in with small delay */
-.animated-search.done .results-panel .card { opacity:1; transform:translateY(0); transition-delay: 60ms; }
-
-/* --- Mobile polish --- */
-@media (max-width:640px) {
-    .single-search-landing { padding: 12px; }
-    .animated-search {
-        width: 100%;
-        max-width: 100%;
-        padding: 12px 14px 12px 54px;
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(2,6,23,0.06);
-        margin: 0 8px;
-    }
-    .animated-search .bar { left: 12px; top: 12px; }
-    .animated-search input { max-width: calc(100% - 120px); font-size: 15px; padding: 10px 12px 10px 10px; }
-    .animated-search .results-panel { position: static; max-height: none; margin-top: 12px; padding: 0; visibility: visible; opacity: 1; }
-    .animated-search .results-panel .card { flex-direction: column; gap:10px; padding:12px; }
-    .animated-search .results-panel .card .card-media { width:100%; height:160px; min-width:unset; }
-    .animated-search .close { right: 12px; top: 12px; }
-}
-
-/* ensure link/tap targets are comfortable on mobile */
-.animated-search .results-panel .card a, .animated-search .results-panel .card .button { padding: 10px 12px; }
 .animated-search .close:before, .animated-search .close:after, .search .close:before, .search .close:after { content: ''; position: absolute; width: 2px; border-radius: 1px; height: 10px; background: #6C7486; display: block; left: 50%; top: 50%; transition: background .3s ease; }
 .animated-search .close:before, .search .close:before { transform: translate(-50%, -50%) rotate(45deg); }
 .animated-search .close:after, .search .close:after { transform: translate(-50%, -50%) rotate(-45deg); }
