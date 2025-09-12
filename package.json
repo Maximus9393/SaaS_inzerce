@@ -1,16 +1,25 @@
 {
   "dependencies": {
+    "@prisma/client": "^6.16.1",
     "axios": "^1.11.0",
+    "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "puppeteer": "^24.16.2"
+    "express-rate-limit": "^8.1.0",
+    "fast-xml-parser": "^5.2.5",
+    "meilisearch": "^0.53.0",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.16.3",
+    "puppeteer": "^24.16.2",
+    "redis": "^5.8.2",
+    "supertest": "^7.1.4"
   },
   "devDependencies": {
-  "concurrently": "^8.2.0",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.3.0",
+    "concurrently": "^8.2.0",
     "jest": "^30.0.5",
     "nodemon": "^3.1.10",
     "ts-jest": "^29.4.1",
@@ -19,17 +28,17 @@
     "typescript": "^5.9.2"
   },
   "scripts": {
-  "test:integration": "./scripts/test-integration.sh",
-  "dev:backend": "npm --prefix smart-market-finder-1/backend run dev",
-  "start:backend": "npm --prefix smart-market-finder-1/backend run start",
-  "frontend": "npm --prefix smart-market-finder-1/frontend start",
-  "dev": "node scripts/run-dev.js",
-  "install:all": "npm ci && (cd smart-market-finder-1/backend && npm ci) && (cd smart-market-finder-1/frontend && npm ci)",
-  "build:all": "(cd smart-market-finder-1/backend && npm run build) && (cd smart-market-finder-1/frontend && npm run build)",
-  "test:all": "(cd smart-market-finder-1/backend && npm test) && (cd smart-market-finder-1/frontend && npm test)",
-  "bootstrap": "npm run install:all && npm run build:all",
-  "dev:all": "concurrently -k \"npm run dev:backend\" \"npm run frontend\"",
-  "start:all": "concurrently -k \"npm run start:backend\" \"npm run frontend\"",
+    "test:integration": "./scripts/test-integration.sh",
+    "dev:backend": "npm --prefix smart-market-finder-1/backend run dev",
+    "start:backend": "npm --prefix smart-market-finder-1/backend run start",
+    "frontend": "npm --prefix smart-market-finder-1/frontend start",
+    "dev": "node scripts/run-dev.js",
+    "install:all": "npm ci && (cd smart-market-finder-1/backend && npm ci) && (cd smart-market-finder-1/frontend && npm ci)",
+    "build:all": "(cd smart-market-finder-1/backend && npm run build) && (cd smart-market-finder-1/frontend && npm run build)",
+    "test:all": "(cd smart-market-finder-1/backend && npm test) && (cd smart-market-finder-1/frontend && npm test)",
+    "bootstrap": "npm run install:all && npm run build:all",
+    "dev:all": "concurrently -k \"npm run dev:backend\" \"npm run frontend\"",
+    "start:all": "concurrently -k \"npm run start:backend\" \"npm run frontend\"",
     "test": "jest --runInBand"
   }
 }

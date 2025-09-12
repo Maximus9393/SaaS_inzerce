@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
-    "rootDir": "./src",
+  "rootDir": ".",
+  "jsx": "react-jsx",
+  "resolveJsonModule": true,
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
@@ -10,10 +12,14 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src/**/*.ts"
+    "backend/src/**/*.ts",
+    "backend/src/**/*.tsx",
+    "backend/scripts/**/*.ts",
+    "backend/__tests__/**/*.ts",
+    "frontend/src/**/*.ts",
+    "frontend/src/**/*.tsx"
   ],
   "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
+    "node_modules"
   ]
 }
