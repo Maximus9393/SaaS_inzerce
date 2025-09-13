@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node backend/src/server.ts",
-    "dev": "concurrently \"npm run dev --prefix backend\" \"PORT=3001 npm start --prefix frontend\"",
+  "dev": "concurrently \"NODE_ENV=development npm run dev --prefix backend\" \"PORT=3000 npm start --prefix frontend\"",
     "backend": "ts-node backend/src/server.ts",
     "frontend": "react-scripts start"
   },

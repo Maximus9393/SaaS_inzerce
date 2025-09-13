@@ -38,6 +38,11 @@ export default function AnimatedSearch(props: Props) {
 
   useEffect(() => { resizeForText(keywords); }, [keywords]);
 
+  // ensure initial sizing on mount using placeholder as a hint
+  useEffect(() => {
+    try { resizeForText(inputRef.current?.placeholder || keywords); } catch (e) {}
+  }, []);
+
   // autofocus and shortcut: focus input on mount or when user presses '/'
   useEffect(() => {
     if (autofocus && inputRef.current) inputRef.current.focus();
@@ -74,63 +79,27 @@ export default function AnimatedSearch(props: Props) {
 
   // timed animation sequence approximating the original
   function startAnimate() {
-    if (!rootRef.current || !barRef.current || preparing) return;
+    if (preparing) return;
     setPreparing(true);
     setExpanded(true);
-    // mark submit briefly
-    // schedule removals/additions using tracked timeouts
+    // minimal, class-driven animation: set animating then done and call onSearch
     const t1 = window.setTimeout(() => {
-      // remove submit visual after short delay
-    }, 200);
-    timeouts.current.push(t1);
-
-    const t2 = window.setTimeout(() => {
       setAnimating(true);
-      // expand the bar width (approx animation)
-  if (barRef.current && rootRef.current) {
-        const parentWidth = rootRef.current.parentElement ? rootRef.current.parentElement.clientWidth : window.innerWidth;
-        // desired width based on results list or a sensible base
-        const desired = Math.max((listRef.current ? listRef.current.scrollWidth + 32 : 320), 240);
-        // cap expansion to available space with an upper bound
-        const maxBar = Math.max(320, Math.min(parentWidth - 96, 900));
-        const finalW = Math.min(desired, maxBar);
-        barRef.current.style.width = finalW + 'px';
-      }
-
-      // after bar animation, expand container height to reveal results
-      const t3 = window.setTimeout(() => {
-        if (rootRef.current && listRef.current) {
-          rootRef.current.style.height = (rootRef.current.offsetHeight + listRef.current.offsetHeight) + 'px';
-        }
-        const t4 = window.setTimeout(() => {
-          setDone(true);
-          setPreparing(false);
-          setAnimating(false);
-          // notify parent to perform search
-          try { onSearch({ q: keywords }); } catch (e) { /* ignore */ }
-        }, 200);
-        timeouts.current.push(t4);
-      }, 800);
-      timeouts.current.push(t3);
-
-    }, 1250);
-    timeouts.current.push(t2);
+      const t2 = window.setTimeout(() => {
+        setDone(true);
+        setPreparing(false);
+        setAnimating(false);
+        try { onSearch({ q: keywords }); } catch (e) { /* ignore */ }
+      }, 300);
+      timeouts.current.push(t2);
+    }, 150);
+    timeouts.current.push(t1);
   }
 
   // expand immediately on focus/click without the full timed sequence
   function expandImmediate() {
-    if (!rootRef.current || !barRef.current) return;
-    setExpanded(true);
-    // set bar width to fit results or a sensible default
-    const parentWidth = rootRef.current.parentElement ? rootRef.current.parentElement.clientWidth : window.innerWidth;
-    const desired = Math.max((listRef.current ? listRef.current.scrollWidth + 32 : 320), 240);
-    const maxBar = Math.max(320, Math.min(parentWidth - 96, 900));
-    const finalW = Math.min(desired, maxBar);
-    barRef.current.style.width = finalW + 'px';
-    // expand container height to show results if any
-    if (listRef.current) {
-      rootRef.current.style.height = (rootRef.current.offsetHeight + listRef.current.offsetHeight) + 'px';
-    }
+  // Only toggle the expanded state; visual expansion is handled by CSS
+  setExpanded(true);
   }
 
   function reset() {
@@ -163,20 +132,31 @@ export default function AnimatedSearch(props: Props) {
   return (
     <div className={`animated-search ${className}`} ref={rootRef} role="search" aria-expanded={expanded}>
       <div className="bar" ref={barRef}>
-        <div className="icon" aria-hidden="true"><i /></div>
+        <button
+          type="button"
+          className="icon"
+          aria-label="Focus search"
+          onClick={() => {
+            if (inputRef.current) inputRef.current.focus();
+            // if there's text, trigger a submit/search visual
+            if ((keywords || '').trim().length > 0) submit();
+          }}
+        ><i /></button>
       </div>
       <form onSubmit={submit}>
         <input
+          className="search-input"
           ref={inputRef}
           type="text"
           value={keywords}
           onChange={e => setKeywords(e.target.value)}
-          onFocus={() => expandImmediate()}
+          onFocus={() => { /* keep compact by default; expand only when user types */ }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') submit();
             if (e.key === 'Escape') reset();
           }}
           placeholder="Hledat (např. Octavia, BMW)"
+          aria-label="Hledat inzeráty"
         />
         {/* hidden span used for precise measurement (moved offscreen to reliably measure width) */}
         <span
@@ -191,7 +171,7 @@ export default function AnimatedSearch(props: Props) {
             whiteSpace: 'pre',
             // ensure measurements match the input font/weight
             font: 'inherit',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: 500,
           }}
         />
@@ -199,7 +179,7 @@ export default function AnimatedSearch(props: Props) {
         {loading ? <div className="inline-spinner" aria-hidden /> : null}
       </form>
       <div className="close" onClick={reset} role="button" aria-label="Close" />
-      <div className="results-panel" ref={listRef} style={{ display: expanded ? undefined : 'none' }}>
+  <div className="results-panel" ref={listRef} style={{ display: (keywords || '').trim().length > 0 ? undefined : 'none' }}>
         {children}
       </div>
     </div>

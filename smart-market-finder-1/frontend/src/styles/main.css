@@ -165,8 +165,8 @@ body {
 
 .search-form { background: linear-gradient(90deg, var(--surface), #fbfbfb); border:1px solid rgba(11,43,76,0.04); padding:12px; border-radius:var(--radius-sm); display:block; margin-bottom:14px }
 .search-row { display:flex; gap:12px; align-items:center; margin-bottom:8px }
-.search-input { flex:1; padding:12px 14px; border:1px solid rgba(11,43,76,0.06); border-radius:999px; font-size:14px; background:transparent; box-shadow: var(--shadow-sm); }
-.search-input::placeholder { color: rgba(11,43,76,0.32); }
+.search-input { flex:1; padding:12px 14px; border:1px solid rgba(11,43,76,0.08); border-radius:999px; font-size:14px; background:transparent; box-shadow: var(--shadow-sm); color:var(--text) }
+.search-input::placeholder { color: rgba(11,43,76,0.48); }
 
 /* Center hero content */
 .hero-search { display:flex; align-items:center; justify-content:center; }
@@ -234,22 +234,50 @@ body {
 .no-results { padding:18px; background:linear-gradient(180deg,var(--surface),var(--bg-elevated)); border-radius:20px; box-shadow:var(--shadow-sm); }
 .example-card { display:flex; gap:12px; align-items:flex-start; padding:14px }
 
-.site-header { position:fixed; top:0; left:0; right:0; height:64px; background: rgba(255,255,255,0.65); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 6px 18px rgba(11,43,76,0.06); display:flex; align-items:center; z-index:900 }
-.site-header .brand-title { font-family: var(--font-sans); }
+.site-header { position:fixed; top:0; left:0; right:0; height:64px; background: rgba(255,255,255,0.75); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 28px rgba(11,43,76,0.06); display:flex; align-items:center; z-index:900; transition: background .24s ease, box-shadow .24s ease; }
+.site-header .brand-title { font-family: var(--font-sans); letter-spacing: -0.01em }
 .site-header.transparent, header.transparent {
     background: transparent;
     box-shadow: none;
 }
-.site-nav { display:flex; align-items:center; gap:8px; padding:6px; border-radius:12px; background: rgba(255,255,255,0.5); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.site-nav a { margin-left:0; color:var(--muted); text-decoration:none; padding:6px 10px; border-radius:999px; background: transparent; box-shadow: none; font-weight:600; font-size:0.95rem }
-.site-nav a:hover { background: rgba(10,79,176,0.08); color: var(--text); transform: translateY(-1px); }
-.site-nav .cta-link { background: linear-gradient(180deg,var(--accent),var(--accent-600)); color:#fff; margin-left:6px; box-shadow: var(--shadow-sm); }
+.site-nav { display:flex; align-items:center; gap:8px; padding:8px; border-radius:12px; background: rgba(255,255,255,0.6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: var(--shadow-sm); }
+.site-nav a { margin-left:0; color:var(--muted); text-decoration:none; padding:8px 12px; border-radius:10px; background: transparent; box-shadow: none; font-weight:600; font-size:0.95rem }
+.site-nav a:hover { background: rgba(10,79,176,0.06); color: var(--text); transform: translateY(-2px); }
+.site-nav .cta-link { background: linear-gradient(180deg,var(--accent),var(--accent-600)); color:#fff; margin-left:6px; box-shadow: var(--shadow-sm); padding:8px 14px }
 
 /* nav icon + animated underline */
 .site-nav .nav-icon { margin-right: 8px; font-size: 14px }
 .site-nav a { position: relative; display: inline-flex; align-items: center; gap:6px }
 .site-nav .nav-underline { position: absolute; left: 12px; right: 12px; bottom: -8px; height: 3px; border-radius: 6px; background: transparent; transform: scaleX(0); transition: transform .28s cubic-bezier(.2,.9,.3,1), background .28s ease; }
 .site-nav a:hover .nav-underline { transform: scaleX(1); background: linear-gradient(90deg,var(--primary),var(--primary-600)); }
+
+/* nav toggle (mobile) */
+.nav-toggle { display:none; border:0; background:transparent; padding:8px; margin-left:12px; cursor:pointer }
+.nav-toggle .hamburger { display:inline-block; width:22px; height:18px; position:relative }
+.nav-toggle .hamburger span { position:absolute; left:0; right:0; height:2px; background:var(--muted); border-radius:2px; transition: transform .22s ease, opacity .18s ease; }
+.nav-toggle .hamburger span:nth-child(1) { top:0 }
+.nav-toggle .hamburger span:nth-child(2) { top:8px }
+.nav-toggle .hamburger span:nth-child(3) { bottom:0 }
+.nav-toggle.open .hamburger span:nth-child(1) { transform: translateY(8px) rotate(45deg) }
+.nav-toggle.open .hamburger span:nth-child(2) { opacity:0 }
+.nav-toggle.open .hamburger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) }
+
+/* mobile: collapse nav into a slide-down panel */
+@media (max-width:840px) {
+    .nav-toggle { display:inline-flex }
+    .site-nav { position: absolute; right: 12px; top: 64px; background: var(--bg-elevated); flex-direction: column; padding:12px; gap:8px; border-radius:12px; min-width:200px; transform-origin: top right; box-shadow: 0 12px 40px rgba(11,43,76,0.12); opacity:0; pointer-events:none; transform: translateY(-6px) scale(.98); transition: transform .2s ease, opacity .18s ease; }
+    .site-nav.open { opacity:1; pointer-events:auto; transform: translateY(0) scale(1); }
+    .site-nav a { display:flex; width:100%; padding:10px 12px; }
+}
+
+/* theme toggle */
+.theme-toggle { border:0; background:transparent; padding:8px; margin-left:8px; cursor:pointer; border-radius:8px; font-size:16px }
+.theme-toggle:hover { background: rgba(11,43,76,0.04) }
+.theme-toggle .icon { display:inline-block }
+
+/* ensure header items align correctly on narrow screens */
+.site-header .site-header-inner { display:flex; align-items:center; justify-content:space-between; gap:12px }
+.brand { display:flex; align-items:center; gap:12px }
 
 /* inline spinner inside the animated search */
 .inline-spinner { width:18px; height:18px; border-radius:50%; border:2px solid rgba(255,255,255,0.4); border-top-color: rgba(255,255,255,0.9); margin-left:8px; animation: spin 0.9s linear infinite; display:inline-block }
@@ -293,6 +321,24 @@ body {
 }
 .page-hero .site-header.scrolled .site-nav a { background: transparent }
 
+/* Darken nav/menu when user scrolls while in light mode (improves contrast) */
+html:not(.theme-dark) .site-header.scrolled {
+    /* slightly stronger, warmened glass to visually anchor the header */
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,250,0.96));
+    box-shadow: 0 8px 30px rgba(8,12,20,0.06);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+html:not(.theme-dark) .site-header.scrolled .site-nav {
+    background: rgba(8,12,20,0.04); /* subtle darken behind nav items */
+    transition: background .22s ease, box-shadow .22s ease;
+}
+
+html:not(.theme-dark) .site-header.scrolled .site-nav a {
+    color: var(--text); /* ensure contrast against the darkened nav */
+}
+
 /* Dark theme: use subtle dark glass for nav */
 .theme-dark .site-header { background: rgba(8,10,14,0.5); box-shadow: 0 6px 18px rgba(0,0,0,0.5); }
 .theme-dark .site-nav { background: rgba(12,14,18,0.36); }
@@ -300,6 +346,8 @@ body {
 
 /* focus states */
 .search-input:focus { outline: 2px solid rgba(10,79,176,0.12); box-shadow: 0 6px 14px rgba(10,79,176,0.06); }
+
+.theme-dark .search-input::placeholder { color: rgba(255,255,255,0.48); }
 
 /* small-screen header adjustments */
 @media (max-width:640px) {
@@ -335,25 +383,26 @@ main { padding-top:84px }
 .animated-search, .search {
     --search-primary: var(--primary);
     --search-primaryLight: var(--primary-600);
-    /* use the elevated bg token so the search visually matches cards/hero */
     background: var(--bg-elevated);
-    /* tighten padding so icon sits closer to input */
-    padding: 10px 14px 10px 44px;
+    /* use flex layout so elements don't overlap and input can grow */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px 10px 72px; /* larger left padding to accommodate icon */
     position: relative;
-    display: table;
     margin: auto;
     border-radius: 10px;
     box-shadow: 0 8px 22px -6px rgba(18,22,33, .10);
     transition: background var(--trans-fast), transform var(--trans-fast), padding var(--trans-medium);
-    width: 520px; max-width: 92%; overflow: visible;
+    width: 520px; max-width: 92%; overflow: visible; box-sizing: border-box;
 }
-.animated-search .bar, .search .bar { position: absolute; left: 16px; top: 15px; width: 32px; height: 32px; overflow: hidden; }
+.animated-search .bar, .search .bar { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; overflow: visible; pointer-events: none }
 .animated-search .bar span, .search .bar span { display:block; color:#fff; position:absolute; left:12px; top:0; line-height:32px; font-weight:500; font-size:16px; opacity:0; right:16px; overflow:hidden; white-space:nowrap }
 .animated-search .bar:before, .search .bar:before { content:''; position:absolute; left:0; top:0; bottom:0; right:16px; border-radius:16px 0 0 16px; background:var(--search-primary); opacity:0 }
-.animated-search .bar .icon, .search .bar .icon { flex:0 0 28px; width:28px; height:28px; background:var(--search-primary); border-radius:50%; position:absolute; z-index:1; top:2px; right:6px; transform-style:preserve-3d; transform-origin:0 0; transform:scale(.86); transition:transform .28s ease, background .12s ease }
+.animated-search .bar .icon, .search .bar .icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 28px; width:28px; height:28px; background:var(--search-primary); border-radius:50%; position:absolute; z-index:40; top:4px; left:4px; right:auto; transform-style:preserve-3d; transform-origin:0 0; transform:scale(.86); transition:transform .18s ease, background .12s ease, box-shadow .12s ease; pointer-events:auto; border:0; cursor:pointer }
 .animated-search .bar .icon:before, .animated-search .bar .icon:after, .search .bar .icon:before, .search .bar .icon:after { content:''; display:block; position:absolute; backface-visibility:hidden; border-radius:50% }
 .animated-search .bar .icon:before, .search .bar .icon:before { background:#fff; left:4px; top:4px; right:4px; bottom:4px; z-index:2 }
-.animated-search form, .search form { display:block; padding:0; margin:0 }
+.animated-search form, .search form { display:flex; flex:1; align-items:center; padding:0; margin:0 }
 .animated-search input, .search input {
     white-space: pre;
     font-size: 16px;
@@ -368,21 +417,22 @@ main { padding-top:84px }
     background: transparent;
     outline: none;
     transition: color .12s ease, width .18s ease, box-shadow .12s ease;
-    width: auto;
-    /* prevent clipping: allow the input to grow but cap it and allow horizontal scroll */
-    max-width: calc(100% - 120px);
-    min-width: 48px;
-    overflow-x: auto;
+    width: 100%;
+    max-width: none;
+    min-width: 80px;
+    overflow: visible;
 }
-.animated-search .close, .search .close { border-radius:50%; position:absolute; right:16px; width:24px; height:24px; background:#E4ECFA; top:19px; cursor:pointer; opacity:0; visibility:hidden; transform:translate(-8px,0); transition: transform .3s ease, opacity .3s ease, visibility .3s ease }
-.animated-search .results-panel, .search .results-panel { overflow:hidden; margin:0; padding:8px 0 24px 0; list-style:none; position:absolute; left:16px; top:62px; right:16px; width:auto; max-height:0; opacity:0; visibility:hidden; transition: max-height .4s ease, opacity .3s ease, visibility .3s ease }
+.animated-search .close, .search .close { border-radius:50%; position:absolute; right:12px; width:28px; height:28px; background:#E4ECFA; top:50%; transform:translateY(-50%); cursor:pointer; opacity:0; visibility:hidden; transition: transform .3s ease, opacity .3s ease, visibility .3s ease; z-index:30 }
+.animated-search .results-panel, .search .results-panel { overflow:hidden; margin:0; padding:8px 0 24px 0; list-style:none; position:absolute; left:16px; top:calc(100% + 12px); right:16px; width:auto; max-height:0; opacity:0; visibility:hidden; transition: max-height .4s ease, opacity .3s ease, visibility .3s ease; z-index:50 }
 .animated-search .results-panel .card, .search .results-panel .card { opacity:0; transform:translateY(-6px); transition: all .3s ease }
 .animated-search.done .results-panel, .search.done .results-panel { max-height:1600px; opacity:1; visibility:visible }
-.animated-search.done .close, .search.done .close { opacity:1; visibility:visible; transform:translate(0,0) }
+.animated-search.done .close, .search.done .close { opacity:1; visibility:visible; transform:translateY(-50%) }
 .animated-search.submit, .search.submit { background:var(--search-primary); transform:scale(.92) }
 .animated-search.submit .bar .icon, .search.submit .bar .icon { background:#fff }
 .animated-search.submit form input, .search.submit form input { color:#fff }
-.animated-search.animate .bar .icon, .search.animate .bar .icon { transform: rotateY(75deg) }
+.animated-search.animate .bar .icon, .search.animate .bar .icon { /* reduce rotation to avoid visual stretching */
+    transform: rotateY(12deg) scale(.95);
+}
 .animated-search .results-panel .card, .search .results-panel .card { display:flex; flex-direction:row; gap:16px; padding:14px; background: linear-gradient(180deg, var(--surface), var(--bg-elevated)); border-radius:12px; border:1px solid rgba(11,43,76,0.04); width:100%; box-sizing:border-box }
 .animated-search .results-panel .card .card-media, .search .results-panel .card .card-media { flex:0 0 140px; max-width:140px; min-width:120px; height:88px; border-radius:10px; overflow:hidden }
 .animated-search .results-panel .card .card-body, .search .results-panel .card .card-body { padding:8px 12px; min-height:88px; flex:1 }
@@ -394,7 +444,10 @@ main { padding-top:84px }
 .animated-search input:focus-visible, .search input:focus-visible { outline: none; box-shadow: 0 0 0 6px rgba(10,79,176,0.12) }
 
 /* improve placeholder contrast for readability */
-.animated-search input::placeholder, .search input::placeholder { color: rgba(11,43,76,0.36) }
+.animated-search input::placeholder, .search input::placeholder { color: rgba(11,43,76,0.58); font-weight:500 }
+
+/* Ensure dark-theme placeholder stays readable but softer */
+.theme-dark .animated-search input::placeholder, .theme-dark .search input::placeholder { color: rgba(255,255,255,0.44) }
 
 /* Respect user's reduced motion preference: simplify animations */
 @media (prefers-reduced-motion: reduce) {
@@ -482,7 +535,7 @@ main { padding-top:84px }
 }
 .animated-search .bar .icon:before, .search .bar .icon:before { background: #fff; left: 4px; top: 4px; right: 4px; bottom: 4px; z-index: 2; transform: rotateY(0deg); transition: background .1s ease; }
 .animated-search .bar .icon:after, .search .bar .icon:after { background: var(--search-primary); left: 0; top: 0; right: 0; bottom: 0; transform: rotateY(180deg); transition: background .1s ease; }
-.animated-search .bar .icon i, .search .bar .icon i { left: 75%; top: 84%; position: absolute; display: block; transform: rotate(-45deg); transform-origin: 0 0; }
+.animated-search .bar .icon i, .search .bar .icon i { width:10px; height:10px; position: relative; display:block; transform: rotate(-45deg); transform-origin: 0 0; }
 .animated-search .bar .icon i:before, .search .bar .icon i:before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--search-primary); display: block; transform-origin: 50% 0; transition: transform .4s ease 0s, background .1s ease; }
 
 .animated-search form, .search form { display: block; padding: 0; margin: 0; }
@@ -524,10 +577,66 @@ main { padding-top:84px }
 .animated-search.animate .bar span, .search.animate .bar span { opacity: 1; }
 
 .animated-search.done, .search.done { padding-right: 56px; transition: padding .4s ease; }
-.animated-search.done .bar .icon, .search.done .bar .icon { transform: rotateY(180deg); transition: transform .7s ease 0s; }
+.animated-search.done .bar .icon, .search.done .bar .icon { transform: rotateY(0deg) scale(.95); transition: transform .3s ease 0s; }
+
+/* show results when component is expanded (on focus) as well as when done */
+.animated-search.expanded .results-panel, .search.expanded .results-panel { max-height: 800px; opacity: 1; visibility: visible }
 .animated-search.done .close, .search.done .close { opacity: 1; visibility: visible; transform: translate(0, 0); transition: transform .4s ease .5s, opacity .4s ease .5s, visibility .4s ease .5s; }
 .animated-search.done .close:hover, .search.done .close:hover { background: var(--search-primaryLight); }
 
 .animated-search.reset .bar:before, .search.reset .bar:before { opacity: 0; transition: opacity 0s ease .4s; }
 .animated-search.reset .bar .icon, .search.reset .bar .icon { transform: rotateY(0deg); transition: transform .4s ease 0s; }
+
+/* icon interactive states */
+.animated-search .bar .icon:hover, .search .bar .icon:hover,
+.animated-search .bar .icon:focus, .search .bar .icon:focus {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(11,43,76,0.12);
+    outline: none;
+}
+
+/* make the icon content accessible when it is a button */
+.animated-search .bar .icon i:before, .search .bar .icon i:before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--search-primary); display: block; transform-origin: 50% 0; transition: transform .4s ease 0s, background .1s ease; }
+
+
+/* Design tweaks: smoother icon visuals, subtle shadow, and nicer results animation */
+.animated-search .bar .icon, .search .bar .icon {
+    /* slightly larger and crisper */
+    width: 30px; height: 30px; flex: 0 0 30px;
+    left: 6px; top: 6px; z-index: 45;
+    box-shadow: 0 6px 18px rgba(11,43,76,0.12);
+    transition: transform .24s cubic-bezier(.22,.9,.28,1), background .12s ease, box-shadow .18s ease;
+    pointer-events: none; /* don't intercept clicks while keeping visual affordance */
+}
+
+/* results animation: slide+fade for a cleaner reveal */
+.animated-search .results-panel, .search .results-panel {
+    transform: translateY(-6px);
+    transition: transform .28s cubic-bezier(.2,.9,.3,1), opacity .28s ease, max-height .45s ease;
+    will-change: transform, opacity;
+    background: linear-gradient(180deg, var(--surface), var(--bg-elevated));
+    box-shadow: 0 18px 40px rgba(11,43,76,0.08);
+    border-radius: 12px;
+}
+.animated-search.expanded .results-panel, .search.expanded .results-panel,
+.animated-search.done .results-panel, .search.done .results-panel {
+    transform: translateY(0);
+    opacity: 1; visibility: visible; max-height: 800px;
+}
+
+/* input spacing: ensure adequate breathing room across variants */
+.animated-search input, .search input { padding-left: 8px; padding-right: 12px; }
+
+/* small-screen: make the animated search full width and icon smaller */
+@media (max-width:840px) {
+    .animated-search, .search { width: 100%; padding-left: 56px; border-radius: 12px }
+    .animated-search .bar .icon, .search .bar .icon { width: 26px; height: 26px; left: 8px; top: 10px; }
+    .animated-search .results-panel, .search .results-panel { left: 8px; right: 8px; top: calc(100% + 8px); }
+}
+
+/* keep things compact on very small screens */
+@media (max-width:480px) {
+    .animated-search, .search { padding-left: 48px }
+    .animated-search .bar .icon, .search .bar .icon { left: 6px }
+}
 

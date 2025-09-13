@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from './Spinner';
 import formatPrice from '../utils/formatPrice';
+import DOMPurify from 'dompurify';
 
 type Item = {
   title?: string;
@@ -73,7 +74,14 @@ export default function ResultsList({ results = [], loading = false }: { results
                 <span style={{ marginLeft: 12, color: '#666', fontSize: 12 }}>{Number(((it as any).distance || 0)).toFixed(1)} km</span>
               ) : null}
             </div>
-            {it.description ? <p className="card-desc">{it.description}</p> : null}
+            {it.description ? (
+              // if description looks like HTML, sanitize and render; otherwise show plain text
+              /<\/?[a-z][\s\S]*>/i.test(String(it.description || '')) ? (
+                <div className="card-desc" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(it.description || '')) }} />
+              ) : (
+                <p className="card-desc">{it.description}</p>
+              )
+            ) : null}
             <div className="card-actions">
               {it.url ? (
                 <>

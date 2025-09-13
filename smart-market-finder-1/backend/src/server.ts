@@ -14,10 +14,15 @@ try { pinoHttp = require('pino-http'); } catch (e) { pinoHttp = null; }
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
-// Honor TRUST_PROXY env var to configure express 'trust proxy' when running behind proxies
+// Honor TRUST_PROXY env var to configure express 'trust proxy' when running behind proxies.
+// Do NOT enable trust proxy automatically in non-production to avoid express-rate-limit
+// validation errors and accidental bypass of IP-based rate limiting.
 try {
   const tp = String(process.env.TRUST_PROXY || '').toLowerCase();
-  if (tp === '1' || tp === 'true') app.set('trust proxy', true);
+  if (tp === '1' || tp === 'true') {
+    app.set('trust proxy', true);
+    logger.info('Express trust proxy enabled via TRUST_PROXY env var');
+  }
 } catch (e) { /* ignore */ }
 
 // parsers
@@ -91,8 +96,8 @@ app.use(errorHandler as any);
 
 // start server only when run directly
 if (require.main === module) {
-  const server = app.listen(PORT, () => {
-    logger.info(`Server is running on http://localhost:${PORT}`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    logger.info(`Server is running on http://0.0.0.0:${PORT}`);
   });
 
   // listen for low-level client errors (e.g. header overflow) and log details

@@ -4,9 +4,10 @@ let client: any = null;
 
 export async function getRedisClient() {
   if (client) return client;
-  const url = (process.env.REDIS_URL || 'redis://127.0.0.1:6379').trim();
-  // allow opting out (tests or environments without redis)
-  if (url === 'off' || url === 'none' || url === 'mock') {
+  const url = (process.env.REDIS_URL || '').trim();
+  // In development, prefer a noop client when REDIS_URL is not provided.
+  // Also support explicit opt-outs via 'off'/'none'/'mock'.
+  if (!url || url === 'off' || url === 'none' || url === 'mock') {
     // noop client implementing the subset we use
     client = {
       get: async (_k: string) => null,

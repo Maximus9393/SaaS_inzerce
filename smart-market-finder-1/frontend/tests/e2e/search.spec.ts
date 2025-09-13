@@ -31,17 +31,18 @@ test('search button works, suggestions (naseptavac) appear and nearby listings s
     res.json(results);
   });
 
-  const server = app.listen(4001);
-
-  // Serve the built frontend from build/ at port 5000
-  const serve = require('serve');
-  const srv = serve(path.resolve(__dirname, '..', '..', 'build'), { port: 5000, silent: true });
+  // Serve both API and static build from the same app on port 5000 so relative /api calls work
+  const expressStatic = require('express').static;
+  const buildPath = path.resolve(__dirname, '..', '..', 'build');
+  app.use(expressStatic(buildPath));
+  const server = app.listen(5000);
+  const srv = { stop: () => server.close() };
 
   try {
     await page.goto(baseURL || 'http://localhost:5000');
 
     // Type into location to trigger suggestions
-    await page.fill('input[placeholder*="Město nebo PSČ"]', 'Praha');
+  await page.fill('input[placeholder="Město nebo PSČ (např. Praha, 10000)"]', 'Praha');
     // Wait for suggestions to appear
     await page.waitForSelector('.postal-suggestions .postal-item', { timeout: 3000 });
     const items = await page.$$('.postal-suggestions .postal-item');
@@ -51,7 +52,7 @@ test('search button works, suggestions (naseptavac) appear and nearby listings s
     await items[0].click();
 
     // Type a keyword and click search
-    await page.fill('input[placeholder*="značku nebo model"]', 'Octavia');
+  await page.fill('input[placeholder="Zadejte značku nebo model auta (např. Octavia, BMW 320d)"]', 'Octavia');
     await page.click('button[type="submit"]');
 
     // Wait for results; expect result cards to render and show distances
@@ -62,7 +63,6 @@ test('search button works, suggestions (naseptavac) appear and nearby listings s
     expect(text).toContain('km');
 
   } finally {
-    server.close();
-    srv.stop && srv.stop();
+  srv.stop && srv.stop();
   }
 });

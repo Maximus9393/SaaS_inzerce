@@ -114,7 +114,7 @@ export default function ListingPage() {
       <div className="container minimal-center">
         <h2>Inzerát nenalezen</h2>
         <p>Žádné informace o inzerátu nebyly předány. Vraťte se na výsledky vyhledávání.</p>
-        <a className="button" href="/results">Zpět na výsledky</a>
+        <a className="button" href="/">Zpět na výsledky</a>
       </div>
     );
   }
@@ -141,7 +141,15 @@ export default function ListingPage() {
 
           <div className="listing-actions">
             <a className="button" href={item.url} target="_blank" rel="noopener noreferrer">Přejít na zdrojový inzerát</a>
-            <button className="button button-ghost" onClick={() => navigate('/results')}>Zpět na výsledky</button>
+            <button
+              className="button button-ghost"
+              onClick={() => {
+                try {
+                  if (window.history && window.history.length > 1) navigate(-1);
+                  else navigate('/');
+                } catch (e) { navigate('/'); }
+              }}
+            >Zpět na výsledky</button>
           </div>
         </section>
       </div>
