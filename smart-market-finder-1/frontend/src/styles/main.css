@@ -399,7 +399,7 @@ main { padding-top:84px }
 .animated-search .bar, .search .bar { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; overflow: visible; pointer-events: none }
 .animated-search .bar span, .search .bar span { display:block; color:#fff; position:absolute; left:12px; top:0; line-height:32px; font-weight:500; font-size:16px; opacity:0; right:16px; overflow:hidden; white-space:nowrap }
 .animated-search .bar:before, .search .bar:before { content:''; position:absolute; left:0; top:0; bottom:0; right:16px; border-radius:16px 0 0 16px; background:var(--search-primary); opacity:0 }
-.animated-search .bar .icon, .search .bar .icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 28px; width:28px; height:28px; background:var(--search-primary); border-radius:50%; position:absolute; z-index:40; top:4px; left:4px; right:auto; transform-style:preserve-3d; transform-origin:0 0; transform:scale(.86); transition:transform .18s ease, background .12s ease, box-shadow .12s ease; pointer-events:auto; border:0; cursor:pointer }
+.animated-search .bar .icon, .search .bar .icon { display:inline-flex; align-items:center; justify-content:center; flex:0 0 28px; width:28px; height:28px; background:var(--search-primary); border-radius:50%; position:absolute; z-index:40; top:50%; left:50%; right:auto; transform-style:preserve-3d; transform-origin:center; transform: translate(-50%, -50%) scale(.90); transition:transform .18s ease, background .12s ease, box-shadow .12s ease; pointer-events:auto; border:0; cursor:pointer }
 .animated-search .bar .icon:before, .animated-search .bar .icon:after, .search .bar .icon:before, .search .bar .icon:after { content:''; display:block; position:absolute; backface-visibility:hidden; border-radius:50% }
 .animated-search .bar .icon:before, .search .bar .icon:before { background:#fff; left:4px; top:4px; right:4px; bottom:4px; z-index:2 }
 .animated-search form, .search form { display:flex; flex:1; align-items:center; padding:0; margin:0 }
@@ -603,10 +603,11 @@ main { padding-top:84px }
 .animated-search .bar .icon, .search .bar .icon {
     /* slightly larger and crisper */
     width: 30px; height: 30px; flex: 0 0 30px;
-    left: 6px; top: 6px; z-index: 45;
+    z-index: 45;
     box-shadow: 0 6px 18px rgba(11,43,76,0.12);
     transition: transform .24s cubic-bezier(.22,.9,.28,1), background .12s ease, box-shadow .18s ease;
-    pointer-events: none; /* don't intercept clicks while keeping visual affordance */
+    pointer-events: auto; /* allow clicks */
+    top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1);
 }
 
 /* results animation: slide+fade for a cleaner reveal */
@@ -630,13 +631,13 @@ main { padding-top:84px }
 /* small-screen: make the animated search full width and icon smaller */
 @media (max-width:840px) {
     .animated-search, .search { width: 100%; padding-left: 56px; border-radius: 12px }
-    .animated-search .bar .icon, .search .bar .icon { width: 26px; height: 26px; left: 8px; top: 10px; }
+    .animated-search .bar .icon, .search .bar .icon { width: 26px; height: 26px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.95); }
     .animated-search .results-panel, .search .results-panel { left: 8px; right: 8px; top: calc(100% + 8px); }
 }
 
 /* keep things compact on very small screens */
 @media (max-width:480px) {
     .animated-search, .search { padding-left: 48px }
-    .animated-search .bar .icon, .search .bar .icon { left: 6px }
+    .animated-search .bar .icon, .search .bar .icon { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.9); }
 }
 
